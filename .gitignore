@@ -1,13 +1,43 @@
-# kit-level ignores — the scaffolded app subfolder carries its own .gitignore
-.DS_Store
+# ── secrets ──────────────────────────────────────────────
 .env
 .env.local
 .env*.local
+*.pem
+
+# ── node / react / next ──────────────────────────────────
 node_modules/
 .next/
+out/
+build/
 dist/
 coverage/
+.turbo/
+.vercel
+next-env.d.ts
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# ── python ───────────────────────────────────────────────
 __pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
 .venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ── os / editor ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
 *.log
+
+# ── kit ──────────────────────────────────────────────────
 test-run/

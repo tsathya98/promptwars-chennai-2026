@@ -1,7 +1,11 @@
 # PromptWars Chennai 2026 — Hackathon Workspace
 
 One-day Google hackathon (25 July 2026). Problem statement revealed at the venue.
-The app under construction lives in a subfolder here once scaffolded.
+**This repo IS the project**: on event day `./starters/setup.sh` (no args) scaffolds
+the Next.js app into the REPO ROOT — Dockerfile, .dockerignore, .env.example, and
+.gitignore already live here. The repo gets renamed to the real project name once
+the problem statement is known. (`./starters/setup.sh <name>` scaffolds into a
+subfolder instead — only for throwaway test runs.)
 
 ## Ground rules for all work in this directory
 

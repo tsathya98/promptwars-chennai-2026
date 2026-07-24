@@ -28,6 +28,6 @@ IndiQube Millenia). Problem statement drops at the venue; this kit makes the fir
 ## Tomorrow at 9:00
 
 1. Problem drops → paste it into kickoff prompt #1 (`prompts/kickoff-prompts.md`).
-2. `./starters/setup.sh <app-name>` → deploy hello-world → build the walking skeleton.
+2. `./starters/setup.sh` (no args — scaffolds into the repo root) → deploy hello-world → build the walking skeleton. Rename the repo: `gh repo edit --rename <name>`.
 3. Claude Code builds; Gemini powers the product; Antigravity gets one showcase task.
 4. 4:00 PM: say "freeze" → the `demo-polish` skill takes over.

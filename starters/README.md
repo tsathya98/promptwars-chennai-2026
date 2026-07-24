@@ -1,9 +1,11 @@
 # Starter Kit — Next.js + Gemini golden skeleton
 
-Run `./setup.sh my-app` the night before (pre-caches npm deps) and again at the venue
-once the problem statement is known. It scaffolds Next.js 15 (App Router, TS, Tailwind),
-installs `ai` + `@ai-sdk/google` + `@google/genai` + `zod` + shadcn/ui basics, and copies
-the golden files from `templates/` into the app.
+**Event day:** run `./setup.sh` with NO args — it scaffolds the Next.js app **into the
+repo root** (this repo IS the project; root already carries Dockerfile, .dockerignore,
+.env.example). **Tonight:** run `./setup.sh test-run` once to warm the npm cache
+(subfolder mode, git-ignored). Either way it scaffolds Next.js 15 (App Router, TS,
+Tailwind), installs `ai` + `@ai-sdk/google` + `@google/genai` + `zod` + shadcn/ui
+basics, and copies the golden files from `templates/`.
 
 ## Golden files (in `templates/`)
 
