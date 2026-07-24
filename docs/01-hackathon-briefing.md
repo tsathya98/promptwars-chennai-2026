@@ -24,6 +24,7 @@
 - [ ] Pre-cache heavy npm deps (run the starter scaffold in `starters/` once tonight, keep `node_modules` or at least the npm cache warm).
 - [ ] Vercel CLI logged in (`npx vercel login`) — fastest public deploy path.
 - [ ] GitHub: `tsathya98` account is wired for `~/Developer/projects/**` (done — commits & pushes here auto-use it).
+- [ ] **Google OAuth client** (in case the app needs "Sign in with Google"): create the consent screen (External, test mode, add your accounts as test users) + a Web OAuth client with `http://localhost:3000` origins/redirects at console.cloud.google.com tonight — it's fiddly under pressure. Save client ID/secret in the password manager. Details: `google-auth` skill.
 - [ ] Phone charged; carry a USB cable (demo from phone via QR code to deployed URL impresses judges).
 
 ## Quota strategy (critical — this decides your day)
