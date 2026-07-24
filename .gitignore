@@ -1,0 +1,13 @@
+# kit-level ignores — the scaffolded app subfolder carries its own .gitignore
+.DS_Store
+.env
+.env.local
+.env*.local
+node_modules/
+.next/
+dist/
+coverage/
+__pycache__/
+.venv/
+*.log
+test-run/

@@ -16,6 +16,23 @@ Treat it as a coherent system across ALL surfaces, not a login-page gimmick. Two
 
 **Intensity budget** still applies: the *ambient* layer appears once; the *component* layer is subtle (low alpha, small radii) and pervasive. Loud everywhere = noise; quiet everywhere + one hero moment = craft.
 
+## The Dribbble/Awwwards stack — and hackathon-speed equivalents
+
+What the studios behind those showpiece sites actually use (verified July 2026): **Next.js + GSAP (ScrollTrigger) + Lenis smooth scroll + Three.js / React Three Fiber with custom GLSL shaders** (WebGPU renderer with WebGL fallback is the emerging flagship pattern). Design-wise the 2026 look is: **dark-default + refined glassmorphism** (subtle translucent layers, NOT heavy blur) floating over **ambient gradient orbs** (deep purple / neon blue / hot pink blurred blobs drifting behind the UI), liquid micro-interactions, kinetic/variable typography, scroll as the storytelling engine. Their #1 craft rule transfers directly: **pick ONE hard idea and execute it cleanly — never stack effects.**
+
+Hackathon-speed equivalents (same look, hours not weeks):
+
+| Studio technique | 1-day equivalent |
+|---|---|
+| Custom GLSL shader backgrounds | Ambient gradient orbs: 2–3 absolutely-positioned `blur(90px)` radial-gradient divs with slow `transform` keyframe drift — pure CSS, looks 90% the same behind glass |
+| Glassmorphism depth system | `backdrop-blur-md bg-white/10 border-white/15` panels over the orbs; one blur strength app-wide; text always on ≥4.5:1 contrast |
+| GSAP ScrollTrigger scenes | `motion/react` `whileInView` staggered reveals; CSS `animation-timeline: view()` for simple cases |
+| Lenis smooth scroll | `npm i lenis` — genuinely 5 minutes, instantly reads "premium"; skip if the app is a dashboard rather than a narrative page |
+| Three.js hero scenes | Our `cursor-field.tsx` particle canvas, or ONE copy-paste WebGL component (below); full R3F only if hours remain, one scene max |
+| Bespoke interaction components | **Aceternity UI** (3D cards, spotlight, glowing beams, particle backgrounds, magnetic buttons) + **Magic UI** (animated beams, bento grids, text effects, number tickers) — both are shadcn-style COPY-PASTE components on Tailwind + Motion, zero lock-in, minutes each |
+
+Assembly recipe for the "Dribbble look" in ~1 hour: dark default → 2–3 gradient orbs behind everything → glass panels for surfaces → our spotlight-card layer on all tiles → one Aceternity hero effect on the landing view → kinetic text reveal on the headline → Lenis if the page scrolls as a story.
+
 ## Technique catalog (all proven, cheapest first)
 
 ### 1. Cursor-reactive particle field (the template — zero deps)
