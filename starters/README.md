@@ -17,6 +17,8 @@ the golden files from `templates/` into the app.
 | `lib/antigravity.ts` | **Subscription-quota Gemini** via headless `agy -p` (text + validated JSON) |
 | `lib/llm.ts` | Unified facade: Antigravity subscription first → API-key fallback |
 | `scripts/agy-batch.mjs` | Fixture/copy generation on subscription quota (zero API spend) |
+| `components/cursor-field.tsx` | Cursor-reactive particle field (ambient layer) — ported from agentic-central-reporting, zero deps |
+| `components/spotlight-card.tsx` | Cursor-spotlight wrapper for ALL cards/tiles (app-wide reactive layer, CSS-vars, zero re-renders) |
 
 ## The architecture these implement (memorize this)
 

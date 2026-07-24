@@ -13,7 +13,9 @@ The app under construction lives in a subfolder here once scaffolded.
 2. **Demo-first, never half-baked**: follow the `rapid-mvp` skill for all feature work
    (cut scope, never quality — every shipped feature meets its Definition of Done and
    the README stays product-grade), the `gemini` skill for all model-calling code, the
-   `antigravity` skill for agy/subscription usage, and `demo-polish` in the final hour.
+   `antigravity` skill for agy/subscription usage, the `interactive-ui` skill for all
+   user-facing UI (cursor-reactive design language), `google-auth` if login is needed,
+   and `demo-polish` in the final hour.
 3. **Docs are pre-baked** — read before proposing architecture:
    - `docs/01-hackathon-briefing.md` — logistics, quota strategy, time budget
    - `docs/02-google-stack.md` — verified model IDs, API snippets, limits

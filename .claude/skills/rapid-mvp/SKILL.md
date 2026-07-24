@@ -27,7 +27,7 @@ You are building a time-boxed demo evaluated on a **90-second live pitch**. Ever
 A feature is NOT done until ALL of these hold. If time runs short, drop the next feature — never ship a current feature below this bar:
 
 - **Functional**: the full happy path works on the DEPLOYED URL, not just localhost.
-- **Eye-catching**: intentional visual design — smooth loading skeletons, micro-transitions (hover/enter states), meaningful empty states, consistent semantic design tokens, dark-mode correct. It should look like a product screenshot, never a bootstrap tutorial.
+- **Eye-catching**: intentional visual design — smooth loading skeletons, micro-transitions (hover/enter states), meaningful empty states, consistent semantic design tokens, dark-mode correct, and cursor-reactive surfaces per the `interactive-ui` skill (spotlight cards app-wide, one ambient moment). It should look like a product screenshot, never a bootstrap tutorial.
 - **Resilient**: friendly styled error states; fallback fixture path for the seeded demo inputs.
 - **Documented**: covered in the README (see §5) and, if user-facing, in the demo script.
 
