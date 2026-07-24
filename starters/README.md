@@ -2,7 +2,7 @@
 
 **Event day:** run `./setup.sh` with NO args — it scaffolds the Next.js app **into the
 repo root** (this repo IS the project; root already carries Dockerfile, .dockerignore,
-.env.example). **Tonight:** run `./setup.sh test-run` once to warm the npm cache
+.env.example). **Tonight:** run `./setup.sh test-run` once to warm the pnpm store
 (subfolder mode, git-ignored). Either way it scaffolds Next.js 15 (App Router, TS,
 Tailwind), installs `ai` + `@ai-sdk/google` + `@google/genai` + `zod` + shadcn/ui
 basics, and copies the golden files from `templates/`.
@@ -21,6 +21,7 @@ basics, and copies the golden files from `templates/`.
 | `scripts/agy-batch.mjs` | Fixture/copy generation on subscription quota (zero API spend) |
 | `components/cursor-field.tsx` | Cursor-reactive particle field (ambient layer) — ported from agentic-central-reporting, zero deps |
 | `components/spotlight-card.tsx` | Cursor-spotlight wrapper for ALL cards/tiles (app-wide reactive layer, CSS-vars, zero re-renders) |
+| `backend/` | Optional Python sidecar: FastAPI + google-genai, **uv-managed** (pyproject + uv Dockerfile per agentic-central-reporting) — only if the problem needs pandas/statsmodels-grade work |
 
 ## The architecture these implement (memorize this)
 

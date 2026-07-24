@@ -22,7 +22,7 @@ IndiQube Millenia). Problem statement drops at the venue; this kit makes the fir
 
 1. Work through the checklist in `docs/01-hackathon-briefing.md` — especially: two AI
    Studio API keys, `agy` login check in a real terminal, Vercel login, run
-   `starters/setup.sh test-run` once to warm the npm cache (then delete `test-run/`).
+   `starters/setup.sh test-run` once to warm the pnpm store (then delete `test-run/`).
 2. Skim docs 02–04 once so the patterns are loaded in your head.
 
 ## Tomorrow at 9:00

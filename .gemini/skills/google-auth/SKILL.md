@@ -14,8 +14,8 @@ Only when the problem statement needs user identity/personalization OR a login s
 **v5 facts (do not use v4 patterns):** config lives in a root `auth.ts` (NOT `pages/api`); `getServerSession` is gone — the exported `auth()` works in Server Components, Route Handlers, middleware, and Server Actions; `AUTH_SECRET` is mandatory.
 
 ```bash
-npm i next-auth@beta   # Auth.js v5
-npx auth secret        # writes AUTH_SECRET to .env.local
+pnpm add next-auth@beta   # Auth.js v5
+pnpm dlx auth secret        # writes AUTH_SECRET to .env.local
 ```
 
 `auth.ts` (repo root) — JWT strategy, **no database**:
@@ -42,7 +42,7 @@ const session = await auth();          // { user: { name, email, image } } | nul
 // <form action={async () => { "use server"; await signIn("google"); }}>
 ```
 
-Env vars: `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` — set locally AND in Vercel (`npx vercel env add ...`).
+Env vars: `AUTH_SECRET`, `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET` — set locally AND in Vercel (`pnpm dlx vercel env add ...`).
 
 **Sign-in button**: follow Google branding (official "G" logo, "Sign in with Google" label) — judges notice correct branding. Show the user's avatar + first name in the header after login; it's the cheapest personalization wow.
 

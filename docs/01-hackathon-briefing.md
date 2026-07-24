@@ -19,10 +19,10 @@
 - [ ] **Gemini API key**: create/verify at [Google AI Studio](https://aistudio.google.com) → export as `GEMINI_API_KEY` in `~/.zshrc`. Create a **second key on a second Google account** as a quota fallback.
 - [ ] **Antigravity**: run `agy` in a real terminal, confirm login works (`agy auth status` needs a TTY). Desktop app installed and signed in too, if you plan to use it. **Do NOT burn quota tonight** — quota is shared across Antigravity desktop + CLI + SDK and resets on a rolling window; the invite explicitly says to reserve tokens for event day.
 - [ ] **Claude Code** signed in (your dev copilot; submission code still targets Google models).
-- [ ] Node 22 ✓ (v22.23.0), npm ✓, Python 3.14 ✓, uv ✓ — already verified.
-- [ ] `npx create-next-app@latest --help` runs once tonight so the package is in npm cache (offline-resilience).
-- [ ] Pre-cache heavy npm deps (run the starter scaffold in `starters/` once tonight, keep `node_modules` or at least the npm cache warm).
-- [ ] Vercel CLI logged in (`npx vercel login`) — fastest public deploy path.
+- [ ] Node 22 ✓ (v22.23.0), pnpm ✓ (10.33), Python 3.14 ✓, uv ✓ (0.11) — already verified. **pnpm for all JS, uv for all Python — never npm/pip** (matches takOS + agentic-central-reporting conventions).
+- [ ] `pnpm dlx create-next-app@latest --help` runs once tonight so the package is in pnpm store (offline-resilience).
+- [ ] Pre-cache heavy npm deps (run the starter scaffold in `starters/` once tonight, keep `node_modules` or at least the pnpm store warm).
+- [ ] Vercel CLI logged in (`pnpm dlx vercel login`) — fastest public deploy path.
 - [ ] GitHub: `tsathya98` account is wired for `~/Developer/projects/**` (done — commits & pushes here auto-use it).
 - [ ] **Google OAuth client** (in case the app needs "Sign in with Google"): create the consent screen (External, test mode, add your accounts as test users) + a Web OAuth client with `http://localhost:3000` origins/redirects at console.cloud.google.com tonight — it's fiddly under pressure. Save client ID/secret in the password manager. Details: `google-auth` skill.
 - [ ] Phone charged; carry a USB cable (demo from phone via QR code to deployed URL impresses judges).

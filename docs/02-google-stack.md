@@ -16,7 +16,7 @@ Both Flash models support: **thinking** (3.6-flash defaults to medium — turn i
 
 ## Gemini API — the calls you'll actually write
 
-SDK: `npm i @google/genai` (JS/TS) or `uv add google-genai` (Python). Auth = `GEMINI_API_KEY` env var.
+SDK: `pnpm add @google/genai` (JS/TS) or `uv add google-genai` (Python). Auth = `GEMINI_API_KEY` env var.
 
 ```ts
 import { GoogleGenAI } from "@google/genai";
@@ -52,7 +52,7 @@ for await (const chunk of await ai.models.generateContentStream({...})) { ... }
 
 ### Vercel AI SDK route (recommended for the Next.js starter)
 
-`npm i ai @ai-sdk/google` — gives `streamText`/`generateObject` + `useChat` React hook; provider reads `GOOGLE_GENERATIVE_AI_API_KEY` (set it to the same key). This is the fastest path from zero to a streaming chat UI with tool calling — see `starters/`.
+`pnpm add ai @ai-sdk/google` — gives `streamText`/`generateObject` + `useChat` React hook; provider reads `GOOGLE_GENERATIVE_AI_API_KEY` (set it to the same key). This is the fastest path from zero to a streaming chat UI with tool calling — see `starters/`.
 
 ```ts
 import { google } from "@ai-sdk/google";
@@ -79,7 +79,7 @@ return result.toUIMessageStreamResponse();
 
 ## Deployment (pick one, decide before the event)
 
-1. **Vercel** — `npx vercel --prod`, zero config for Next.js, env vars via dashboard/CLI. Fastest; use this by default.
+1. **Vercel** — `pnpm dlx vercel --prod`, zero config for Next.js, env vars via dashboard/CLI. Fastest; use this by default.
 2. **Cloud Run** — more "Google-native" story if judges care; needs gcloud CLI (NOT currently installed — install tonight only if you want this path: `brew install google-cloud-sdk`).
 3. **AI Studio "Build" / apps** — AI Studio can scaffold and host small Gemini apps directly; fine for a backup toy, not for a real Next.js app.
 

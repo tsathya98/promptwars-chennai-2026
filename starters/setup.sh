@@ -1,5 +1,5 @@
 #!/bin/bash
-# PromptWars starter scaffold.
+# PromptWars starter scaffold (pnpm-first, per takOS/agentic-central-reporting).
 # Usage: ./setup.sh              → scaffold INTO THE REPO ROOT (default —
 #                                  this repo IS the project on event day)
 #        ./setup.sh <app-name>   → scaffold into a subfolder (e.g. tonight's
@@ -12,19 +12,19 @@ if [ -z "${1:-}" ]; then
   # ── in-place: create-next-app refuses non-empty dirs, so scaffold in a
   #    temp dir and move in without clobbering kit files.
   TMP="$(mktemp -d)/app"
-  npx create-next-app@latest "$TMP" --ts --tailwind --eslint --app --src-dir=false \
-    --import-alias "@/*" --use-npm --yes
+  pnpm dlx create-next-app@latest "$TMP" --ts --tailwind --eslint --app --src-dir=false \
+    --import-alias "@/*" --use-pnpm --yes
   rm -f "$TMP/README.md" "$TMP/.gitignore"   # kit root keeps its own
   cp -Rn "$TMP/." "$ROOT/"
   rm -rf "$(dirname "$TMP")"
   cd "$ROOT"
-  npm install
+  pnpm install
   # Dockerfile/.dockerignore/.env.example already live at repo root.
   cp "$HERE/templates/.env.example" .env.local
 else
   APP="$1"
-  npx create-next-app@latest "$APP" --ts --tailwind --eslint --app --src-dir=false \
-    --import-alias "@/*" --use-npm --yes
+  pnpm dlx create-next-app@latest "$APP" --ts --tailwind --eslint --app --src-dir=false \
+    --import-alias "@/*" --use-pnpm --yes
   cd "$APP"
   cp "$HERE/templates/.env.example" .env.example
   cp "$HERE/templates/.env.example" .env.local
@@ -33,9 +33,9 @@ else
   cp "$HERE/templates/.dockerignore" .dockerignore
 fi
 
-npm i ai @ai-sdk/google @ai-sdk/react @google/genai zod lucide-react recharts
-npx shadcn@latest init -d --yes || true
-npx shadcn@latest add button card input skeleton badge --yes || true
+pnpm add ai @ai-sdk/google @ai-sdk/react @google/genai zod lucide-react recharts
+pnpm dlx shadcn@latest init -d --yes || true
+pnpm dlx shadcn@latest add button card input skeleton badge --yes || true
 
 # Golden template files
 cp -R "$HERE/templates/lib" .
@@ -50,5 +50,7 @@ cp "$HERE/templates/scripts/agy-batch.mjs" scripts/ && chmod +x scripts/agy-batc
 echo ""
 echo "✅ Scaffold ready in $(pwd). Next:"
 echo "  1. Fill .env.local (GEMINI_API_KEY etc. — root .env values work too)"
-echo "  2. npm run dev  →  check http://localhost:3000/api/health"
-echo "  3. npx vercel --prod  (env vars: npx vercel env add GEMINI_API_KEY)"
+echo "  2. pnpm dev  →  check http://localhost:3000/api/health"
+echo "  3. pnpm dlx vercel --prod  (env vars: pnpm dlx vercel env add GEMINI_API_KEY)"
+echo ""
+echo "Python backend (only if needed): cp -R $HERE/templates/backend ./backend && cd backend && uv sync"

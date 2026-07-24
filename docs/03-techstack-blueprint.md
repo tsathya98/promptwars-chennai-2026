@@ -6,6 +6,7 @@ Decided in advance so zero time is spent on stack debates at the venue. Informed
 
 | Layer | Choice | Why |
 |---|---|---|
+| Package managers | **pnpm** for all JS, **uv** for all Python — never npm/pip | Both reference repos pin these (takOS `packageManager: pnpm@11`, agentic-central-reporting pnpm 10 + uv workspace) |
 | App | **Next.js 15 App Router + React 19 + TypeScript** (single app, NO monorepo) | Same as agentic-central-reporting's frontend; API routes replace a separate backend entirely for a demo |
 | Styling | **Tailwind CSS 4 + shadcn/ui** | cva/cn component pattern from takOS, zero design time |
 | AI plumbing | **Vercel AI SDK (`ai` + `@ai-sdk/google`)**: `streamText` + tools + `useChat`; raw `@google/genai` only for search grounding / Live API | Collapses the entire FastAPI + ChatKit + MCP stack of the Takeda POCs into API routes |
@@ -13,7 +14,7 @@ Decided in advance so zero time is spent on stack debates at the venue. Informed
 | Charts | **Recharts** | Lighter than Highcharts, good enough for a demo |
 | State | `useChat` + plain React state; **localStorage** for persistence | agentic-central-reporting's sandbox-store pattern; no DB |
 | Data | JSON files / in-memory seeded data; SQLite via better-sqlite3 only if the problem is data-heavy | No time for real infra |
-| Deploy | **Vercel** (`npx vercel --prod`) | 2-minute deploys, public URL for the QR code |
+| Deploy | **Vercel** (`pnpm dlx vercel --prod`) | 2-minute deploys, public URL for the QR code |
 | Dev tooling | **Claude Code** (build) + **Antigravity/`agy`** (one showcase task + narrative) | Two quota lanes — see briefing doc |
 
 **Explicitly skip** (all present in the Takeda repos, none earn their cost in one day): Nx monorepo, MCP process separation (in-process AI SDK tools are equivalent for a demo), auth (MSAL/Entra), Redis/Kafka, DynamoDB/RDS, OTel, Storybook, testing beyond one smoke check, CI, micro-frontends, design-token pipelines.

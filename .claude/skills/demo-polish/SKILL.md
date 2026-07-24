@@ -32,7 +32,7 @@ When feature freeze is called (or at 4:00 PM), immediately halt new feature deve
    - **Google Tech Stack Bullet Points**: Name-check **Gemini 3.6 Flash**, **Gemini 3.5 Flash-Lite**, **Google Search Grounding**, **Structured Outputs**, **Vercel AI SDK**, and **Antigravity**.
    - **Next Steps & Contact**: One concluding line.
 3. **Generate QR Code**:
-   - Generate `public/qr.png` pointing to the live deployed Vercel URL using `npx qrcode <DEPLOYED_URL> -o public/qr.png`.
+   - Generate `public/qr.png` pointing to the live deployed Vercel URL using `pnpm dlx qrcode <DEPLOYED_URL> -o public/qr.png`.
    - Add a QR code toggle or footer link in the web app UI for judges to test on their mobile devices.
 
 ## Step 4: Insurance & Verification

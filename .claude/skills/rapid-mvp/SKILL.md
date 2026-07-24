@@ -12,7 +12,7 @@ You are building a time-boxed demo evaluated on a **90-second live pitch**. Ever
 ## 1. Prime Directives
 
 1. **The Deployed URL is the Single Source of Truth**:
-   - Deploy to Vercel within the first **40 minutes** (`npx vercel --prod`).
+   - Deploy to Vercel within the first **40 minutes** (`pnpm dlx vercel --prod`).
    - Re-deploy after every feature addition. Never allow local development state to diverge >30 minutes from the live deployment.
 2. **Demo-First Execution**:
    - Prioritize what judges *see* and *experience* over hidden architectural perfection.

@@ -27,7 +27,7 @@ Hackathon-speed equivalents (same look, hours not weeks):
 | Custom GLSL shader backgrounds | Ambient gradient orbs: 2–3 absolutely-positioned `blur(90px)` radial-gradient divs with slow `transform` keyframe drift — pure CSS, looks 90% the same behind glass |
 | Glassmorphism depth system | `backdrop-blur-md bg-white/10 border-white/15` panels over the orbs; one blur strength app-wide; text always on ≥4.5:1 contrast |
 | GSAP ScrollTrigger scenes | `motion/react` `whileInView` staggered reveals; CSS `animation-timeline: view()` for simple cases |
-| Lenis smooth scroll | `npm i lenis` — genuinely 5 minutes, instantly reads "premium"; skip if the app is a dashboard rather than a narrative page |
+| Lenis smooth scroll | `pnpm add lenis` — genuinely 5 minutes, instantly reads "premium"; skip if the app is a dashboard rather than a narrative page |
 | Three.js hero scenes | Our `cursor-field.tsx` particle canvas, or ONE copy-paste WebGL component (below); full R3F only if hours remain, one scene max |
 | Bespoke interaction components | **Aceternity UI** (3D cards, spotlight, glowing beams, particle backgrounds, magnetic buttons) + **Magic UI** (animated beams, bento grids, text effects, number tickers) — both are shadcn-style COPY-PASTE components on Tailwind + Motion, zero lock-in, minutes each |
 
