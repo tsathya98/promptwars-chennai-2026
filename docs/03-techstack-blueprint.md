@@ -7,7 +7,8 @@ Decided in advance so zero time is spent on stack debates at the venue. Informed
 | Layer | Choice | Why |
 |---|---|---|
 | Package managers | **pnpm** for all JS, **uv** for all Python — never npm/pip | Both reference repos pin these (takOS `packageManager: pnpm@11`, agentic-central-reporting pnpm 10 + uv workspace) |
-| App | **Next.js 15 App Router + React 19 + TypeScript** (single app, NO monorepo) | Same as agentic-central-reporting's frontend; API routes replace a separate backend entirely for a demo |
+| Workspace | **Nx 23 monorepo** — `apps/web` + optional `apps/backend` (uv), **pre-scaffolded and build-verified the night before** | Same shape as agentic-central-reporting (Nx + pnpm + uv); costs zero venue time because it's already built — scaffolding Nx AT the venue would not be worth it |
+| App | **Next.js 15 App Router + React 19 + TypeScript** (`apps/web`) | Same as agentic-central-reporting's frontend; API routes replace a separate backend entirely for a demo |
 | Styling | **Tailwind CSS 4 + shadcn/ui** | cva/cn component pattern from takOS, zero design time |
 | AI plumbing | **Vercel AI SDK (`ai` + `@ai-sdk/google`)**: `streamText` + tools + `useChat`; raw `@google/genai` only for search grounding / Live API | Collapses the entire FastAPI + ChatKit + MCP stack of the Takeda POCs into API routes |
 | Models | `gemini-3.6-flash` (star calls) + `gemini-3.5-flash-lite` (background/fallback) | See `02-google-stack.md` |
@@ -17,7 +18,7 @@ Decided in advance so zero time is spent on stack debates at the venue. Informed
 | Deploy | **Vercel** (`pnpm dlx vercel --prod`) | 2-minute deploys, public URL for the QR code |
 | Dev tooling | **Claude Code** (build) + **Antigravity/`agy`** (one showcase task + narrative) | Two quota lanes — see briefing doc |
 
-**Explicitly skip** (all present in the Takeda repos, none earn their cost in one day): Nx monorepo, MCP process separation (in-process AI SDK tools are equivalent for a demo), auth (MSAL/Entra), Redis/Kafka, DynamoDB/RDS, OTel, Storybook, testing beyond one smoke check, CI, micro-frontends, design-token pipelines.
+**Explicitly skip** (all present in the Takeda repos, none earn their cost in one day): new Nx libs/apps beyond the two pre-scaffolded ones, MCP process separation (in-process AI SDK tools are equivalent for a demo), auth (MSAL/Entra), Redis/Kafka, DynamoDB/RDS, OTel, Storybook, testing beyond one smoke check, CI, micro-frontends, design-token pipelines.
 
 ## The architecture (memorize — it's one diagram)
 

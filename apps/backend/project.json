@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "root": "apps/backend",
+  "projectType": "application",
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": { "command": "uv run uvicorn main:app --reload --port 8000", "cwd": "apps/backend" }
+    },
+    "sync": {
+      "executor": "nx:run-commands",
+      "options": { "command": "uv sync", "cwd": "apps/backend" }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "uv run ruff check .", "cwd": "apps/backend" }
+    }
+  }
+}

@@ -1,27 +1,23 @@
-# Next.js standalone production image (multi-stage, pnpm via corepack).
-# REQUIRES in next.config.ts:  output: "standalone"
-# NOTE: agy does not exist in containers — LLM_PROVIDER is forced to `api`.
-FROM node:22-alpine AS deps
-WORKDIR /app
-RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-
+# Next.js (apps/web) standalone image — Nx monorepo, pnpm via corepack.
+# Build from REPO ROOT: docker build -t promptwars .
+# NOTE: agy does not exist in containers — LLM_PROVIDER forced to `api`.
 FROM node:22-alpine AS build
-WORKDIR /app
+WORKDIR /repo
 RUN corepack enable
-COPY --from=deps /app/node_modules ./node_modules
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig*.json ./
+COPY apps/web/package.json apps/web/package.json
+RUN pnpm install --frozen-lockfile
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm build
+RUN pnpm nx build web
 
 FROM node:22-alpine AS run
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 LLM_PROVIDER=api PORT=3000
 RUN addgroup -S app && adduser -S app -G app
-COPY --from=build --chown=app:app /app/.next/standalone ./
-COPY --from=build --chown=app:app /app/.next/static ./.next/static
-COPY --from=build --chown=app:app /app/public ./public
+COPY --from=build --chown=app:app /repo/apps/web/.next/standalone ./
+COPY --from=build --chown=app:app /repo/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=app:app /repo/apps/web/public ./apps/web/public
 USER app
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["node", "apps/web/server.js"]

@@ -41,3 +41,5 @@ Thumbs.db
 
 # ── kit ──────────────────────────────────────────────────
 test-run/
+.nx/cache
+.nx/workspace-data

@@ -50,20 +50,19 @@ A feature is NOT done until ALL of these hold. If time runs short, drop the next
 
 Judges and mentors WILL open the repo. Maintain from the first hour (not retrofitted at the end):
 
-- **README.md** — product-grade, updated as features land:
-  - One-line pitch + a banner/screenshot or short GIF of the app near the top.
-  - "What it does" — 3-5 feature bullets phrased as user value, not implementation.
-  - Architecture diagram (mermaid) of the UI → API → Gemini → renderer flow.
-  - Tech-stack section explicitly name-checking the Google stack (Gemini 3.6 Flash, AI Studio, Antigravity, search grounding, structured outputs).
-  - "Run it" — exact copy-paste setup: env vars table, install, dev, deploy.
-  - Live demo URL + QR code image.
+- **README.md** — the repo root already contains a jury-grade TEMPLATE with `{{...}}`
+  placeholders (hero + badges, problem, features, 90-second demo beats, mermaid
+  architecture, Google-stack table, quickstart, footer). Fill every placeholder within
+  the first hour; update as features land; never leave a `{{...}}` visible at freeze.
+  Screenshots: capture the deployed app (Cmd+Shift+5) into `public/hero.png` once the
+  UI is presentable, again before the pitch. Never list unshipped features.
 - **.env.example** — every variable with a one-line comment; never let setup require guesswork.
 - **PITCH.md** — maintained by the demo-polish skill in the final hour.
 - Code comments only where a constraint isn't obvious — documentation effort goes to the README, not inline noise.
 
 ## 6. Code & Architecture Discipline
 
-- **Single App Router Layout**: Next.js 15 App Router + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui.
+- **Nx monorepo (pre-scaffolded)**: `apps/web` = Next.js 15 App Router + React 19 + TypeScript + Tailwind CSS 4 (+ shadcn/ui); `apps/backend` = optional uv-managed FastAPI sidecar. Run everything through `pnpm nx ...` (`dev web`, `build web`, `serve backend`). Do NOT create new apps/libs mid-hackathon unless the problem truly demands it.
 - **Centralized Wrapper**: ALL Gemini API calls must route through `lib/gemini.ts` (or `lib/llm.ts`).
 - **Zero-Token UI Iteration**: Toggle `MOCK=1` in `.env.local` to iterate on UI components using cached JSON fixtures without spending Gemini API quota.
 - **Frequent Git Commits**: Commit after every working slice (`git commit -am "wip: <feature>"`).

@@ -1,56 +1,27 @@
 #!/bin/bash
-# PromptWars starter scaffold (pnpm-first, per takOS/agentic-central-reporting).
-# Usage: ./setup.sh              → scaffold INTO THE REPO ROOT (default —
-#                                  this repo IS the project on event day)
-#        ./setup.sh <app-name>   → scaffold into a subfolder (e.g. tonight's
-#                                  test-run; folder is git-ignored if named test-run)
+# Bootstrap/verify the PRE-SCAFFOLDED Nx workspace (the workspace already lives
+# at the repo root — apps/web + apps/backend — so there is nothing to scaffold).
+# Run tonight to warm caches, and at the venue after cloning.
 set -euo pipefail
-HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
 
-if [ -z "${1:-}" ]; then
-  # ── in-place: create-next-app refuses non-empty dirs, so scaffold in a
-  #    temp dir and move in without clobbering kit files.
-  TMP="$(mktemp -d)/app"
-  pnpm dlx create-next-app@latest "$TMP" --ts --tailwind --eslint --app --src-dir=false \
-    --import-alias "@/*" --use-pnpm --yes
-  rm -f "$TMP/README.md" "$TMP/.gitignore"   # kit root keeps its own
-  cp -Rn "$TMP/." "$ROOT/"
-  rm -rf "$(dirname "$TMP")"
-  cd "$ROOT"
-  pnpm install
-  # Dockerfile/.dockerignore/.env.example already live at repo root.
-  cp "$HERE/templates/.env.example" .env.local
-else
-  APP="$1"
-  pnpm dlx create-next-app@latest "$APP" --ts --tailwind --eslint --app --src-dir=false \
-    --import-alias "@/*" --use-pnpm --yes
-  cd "$APP"
-  cp "$HERE/templates/.env.example" .env.example
-  cp "$HERE/templates/.env.example" .env.local
-  cp "$HERE/templates/.gitignore" .gitignore
-  cp "$HERE/templates/Dockerfile" Dockerfile
-  cp "$HERE/templates/.dockerignore" .dockerignore
-fi
+echo "── pnpm install (workspace)"
+pnpm install
 
-pnpm add ai @ai-sdk/google @ai-sdk/react @google/genai zod lucide-react recharts
-pnpm dlx shadcn@latest init -d --yes || true
-pnpm dlx shadcn@latest add button card input skeleton badge --yes || true
+echo "── env files"
+[ -f .env.local ] || cp .env.example .env.local
+[ -f apps/web/.env.local ] || cp .env.example apps/web/.env.local
+echo "   → fill GEMINI_API_KEY in apps/web/.env.local"
 
-# Golden template files
-cp -R "$HERE/templates/lib" .
-mkdir -p app/api/health app/api/chat components fixtures scripts
-cp "$HERE/templates/app/api/health/route.ts" app/api/health/route.ts
-cp "$HERE/templates/app/api/chat/route.ts" app/api/chat/route.ts
-cp "$HERE/templates/components/widget-renderer.tsx" components/
-cp "$HERE/templates/components/cursor-field.tsx" components/
-cp "$HERE/templates/components/spotlight-card.tsx" components/
-cp "$HERE/templates/scripts/agy-batch.mjs" scripts/ && chmod +x scripts/agy-batch.mjs
+echo "── build check"
+pnpm nx build web
+
+echo "── optional python sidecar (skip unless needed)"
+echo "   cd apps/backend && uv sync && pnpm nx serve backend"
 
 echo ""
-echo "✅ Scaffold ready in $(pwd). Next:"
-echo "  1. Fill .env.local (GEMINI_API_KEY etc. — root .env values work too)"
-echo "  2. pnpm dev  →  check http://localhost:3000/api/health"
-echo "  3. pnpm dlx vercel --prod  (env vars: pnpm dlx vercel env add GEMINI_API_KEY)"
-echo ""
-echo "Python backend (only if needed): cp -R $HERE/templates/backend ./backend && cd backend && uv sync"
+echo "✅ Workspace verified. Next:"
+echo "  pnpm nx dev web         → http://localhost:3000 (+ /api/health)"
+echo "  pnpm dlx vercel --prod  → set Root Directory to apps/web in Vercel"
+echo "  gh repo edit --rename <real-project-name>   (once problem is known)"
