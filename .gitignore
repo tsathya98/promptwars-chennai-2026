@@ -43,3 +43,7 @@ Thumbs.db
 test-run/
 .nx/cache
 .nx/workspace-data
+
+# ── others ───────────────────────────────────────────────
+temp
+tmp
