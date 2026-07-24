@@ -12,6 +12,7 @@ IndiQube Millenia). Problem statement drops at the venue; this kit makes the fir
 | `docs/02-google-stack.md` | Verified Gemini 3.6 Flash / 3.5 Flash-Lite reference, API snippets, free-tier limits, Antigravity notes |
 | `docs/03-techstack-blueprint.md` | The decided stack (Next.js 15 + AI SDK + Gemini), architecture diagram, feature menu |
 | `docs/04-takeda-patterns.md` | Distilled innovations from 4 production repos, translated to Gemini |
+| `docs/05-antigravity-programmatic.md` | **Subscription-first model access** — `agy -p` wrapper templates, routing rules, verified locally |
 | `prompts/kickoff-prompts.md` | Copy-paste prompts: triage → scaffold → iterate → freeze → emergency |
 | `prompts/system-prompts.md` | System-prompt templates for the app itself |
 | `.claude/skills/` | Auto-loaded Claude Code skills: `gemini`, `hackathon-mvp`, `demo-polish` |

@@ -16,6 +16,11 @@ Do this:
 3. Recommend ONE. Define its walking skeleton: the thinnest end-to-end slice
    (UI → API route → Gemini → rendered result) I should have deployed within 40 minutes.
 4. List what to explicitly NOT build (auth, settings, persistence, multi-user...).
+5. Credibility check (web-search anything uncertain — do NOT answer from memory):
+   verify every load-bearing assumption of the recommended design — the external
+   API/dataset exists, is free/keyless or we have access, the library/model capability
+   is real, and any domain claim the pitch will make is factually right. Kill or
+   downgrade any candidate whose core assumption fails verification.
 ```
 
 ## 2. Scaffold + first deploy (give to Claude Code right after triage)

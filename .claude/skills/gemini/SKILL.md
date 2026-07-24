@@ -5,6 +5,18 @@ description: Gemini API integration patterns for the PromptWars hackathon — co
 
 # Gemini Integration (hackathon build rules)
 
+## Provider routing — Antigravity subscription FIRST, API key second
+
+- **Non-interactive generation running locally** (reports, summaries, canvas content):
+  `generateText()` from `lib/llm.ts` — uses `agy -p` on subscription quota, auto-falls
+  back to API key. Details: `docs/05-antigravity-programmatic.md`.
+- **Dev/build-time generation** (fixtures, seed data, copy): `scripts/agy-batch.mjs` —
+  pure subscription quota.
+- **Interactive streaming chat and anything deployed** (Vercel): API-key path only —
+  `agy` doesn't exist there. Set `LLM_PROVIDER=api` in Vercel env.
+- `agy` rules: always `--sandbox` in print mode (it auto-approves tool calls), prefer
+  `-low` effort variants, batch items into one prompt (each call has ~10s init overhead).
+
 ## Models — use EXACTLY these IDs (verified July 2026)
 
 - `gemini-3.6-flash` — main model: chat, agentic, multimodal, structured output.

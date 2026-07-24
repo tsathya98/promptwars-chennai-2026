@@ -17,13 +17,16 @@ cp -R "$HERE/templates/lib" .
 mkdir -p app/api/health app/api/chat
 cp "$HERE/templates/app/api/health/route.ts" app/api/health/route.ts
 cp "$HERE/templates/app/api/chat/route.ts" app/api/chat/route.ts
-mkdir -p components fixtures
+mkdir -p components fixtures scripts
 cp "$HERE/templates/components/widget-renderer.tsx" components/
+cp "$HERE/templates/scripts/agy-batch.mjs" scripts/ && chmod +x scripts/agy-batch.mjs
 
 cat > .env.local <<'EOF'
 GEMINI_API_KEY=
 GOOGLE_GENERATIVE_AI_API_KEY=
 GEMINI_API_KEY_FALLBACK=
+# antigravity = subscription-first with API fallback (local); set to "api" on Vercel
+LLM_PROVIDER=antigravity
 MOCK=0
 EOF
 

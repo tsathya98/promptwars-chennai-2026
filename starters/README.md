@@ -14,6 +14,9 @@ the golden files from `templates/` into the app.
 | `app/api/chat/route.ts` | Streaming chat with tools via AI SDK `streamText` |
 | `components/widget-renderer.tsx` | Generic SDUI renderer (card/row/col/title/text/badge/chart/table) — the generative-UI trick from agentic-central-reporting |
 | `lib/widget-types.ts` | Zod schemas for widget tree + section specs |
+| `lib/antigravity.ts` | **Subscription-quota Gemini** via headless `agy -p` (text + validated JSON) |
+| `lib/llm.ts` | Unified facade: Antigravity subscription first → API-key fallback |
+| `scripts/agy-batch.mjs` | Fixture/copy generation on subscription quota (zero API spend) |
 
 ## The architecture these implement (memorize this)
 

@@ -22,7 +22,8 @@ Run these in order; skip nothing. No new features from this point.
 
 ## 3. Pitch collateral
 
-Write `PITCH.md`:
+Web-verify every factual claim the pitch makes (statistics, market numbers, domain
+facts) — cut or soften anything unverifiable. Then write `PITCH.md`:
 1. **Hook** (1 line): the user pain, concrete.
 2. **Live demo script** (3 beats, exact clicks, ≤60s total): each beat = what I click → what appears → one-line why it's impressive.
 3. **Google-stack slide bullet list**: Gemini 3.6 Flash (star calls), 3.5 Flash-Lite (background), AI Studio key, Antigravity usage, structured outputs / search grounding — name-check them explicitly, it's a Google event.

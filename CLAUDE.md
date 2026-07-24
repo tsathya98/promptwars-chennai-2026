@@ -6,8 +6,10 @@ The app under construction lives in a subfolder here once scaffolded.
 ## Ground rules for all work in this directory
 
 1. **Submission code uses Google models only**: `gemini-3.6-flash` (main) and
-   `gemini-3.5-flash-lite` (fast/fallback) via `GEMINI_API_KEY`. Never other providers
-   in app code. Never invent model IDs.
+   `gemini-3.5-flash-lite` (fast/fallback). Never other providers in app code. Never
+   invent model IDs. **Provider priority: Antigravity subscription (`agy -p`, local
+   non-interactive calls) first, API key second** — routing rules in
+   `docs/05-antigravity-programmatic.md`; streaming/deployed paths are API-key only.
 2. **Demo-first**: follow the `hackathon-mvp` skill for all feature work, the `gemini`
    skill for all model-calling code, and the `demo-polish` skill in the final hour.
 3. **Docs are pre-baked** — read before proposing architecture:

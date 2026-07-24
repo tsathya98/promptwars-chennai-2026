@@ -20,6 +20,16 @@ You are building a one-day hackathon demo, not a product. Judges see a 90-second
 - DO build: loading skeletons, friendly error states, an "example inputs" bar, dark-mode-correct styling (single pass), the `/api/health` Gemini smoke check.
 - Any feature estimated >45 min: propose a faked/simplified version first and ask which to build.
 
+## Credibility checks (web search — cheap insurance, use it)
+
+- Before committing to any external dependency (public API, dataset, npm package, model
+  capability), spend one web search verifying it exists, is accessible without signup
+  friction, and works the way assumed. Never build 30 minutes on an unverified assumption.
+- Fact-check domain claims that will appear in the demo or pitch (statistics, regulations,
+  domain workflows) — a judge who knows the domain will catch an invented fact instantly.
+- If a design decision hinges on "is X the standard way to do this in 2026", search rather
+  than answer from memory.
+
 ## Code style under time pressure
 
 - One `lib/gemini.ts` wrapper (see `gemini` skill). One `components/` folder, flat. No premature abstraction — copy-paste twice before extracting.
