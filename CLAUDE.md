@@ -10,8 +10,10 @@ The app under construction lives in a subfolder here once scaffolded.
    invent model IDs. **Provider priority: Antigravity subscription (`agy -p`, local
    non-interactive calls) first, API key second** — routing rules in
    `docs/05-antigravity-programmatic.md`; streaming/deployed paths are API-key only.
-2. **Demo-first**: follow the `hackathon-mvp` skill for all feature work, the `gemini`
-   skill for all model-calling code, and the `demo-polish` skill in the final hour.
+2. **Demo-first, never half-baked**: follow the `rapid-mvp` skill for all feature work
+   (cut scope, never quality — every shipped feature meets its Definition of Done and
+   the README stays product-grade), the `gemini` skill for all model-calling code, the
+   `antigravity` skill for agy/subscription usage, and `demo-polish` in the final hour.
 3. **Docs are pre-baked** — read before proposing architecture:
    - `docs/01-hackathon-briefing.md` — logistics, quota strategy, time budget
    - `docs/02-google-stack.md` — verified model IDs, API snippets, limits

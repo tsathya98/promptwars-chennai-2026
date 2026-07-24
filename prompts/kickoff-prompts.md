@@ -41,8 +41,10 @@ Work demo-first: after every change tell me what I can now show a judge.
 ```
 Current demo state: {WHAT WORKS}. Time left: {N} hours.
 Next: {FEATURE}. Constraints: must not break the deployed demo; if riskier than 30 min,
-propose a faked/seeded version first (hardcoded demo data is fine — this is a demo,
-not a product). Implement, then give me the one-line demo script for this feature.
+propose a seeded/simplified-scope version first (seeded demo data is a legitimate
+strategy — but whatever ships must meet the rapid-mvp Definition of Done: functional
+on the deployed URL, visually polished, error-resilient, documented in the README).
+Implement, then give me the one-line demo script for this feature.
 ```
 
 ## 4. Structured-output UI (the generative-UI trick)
