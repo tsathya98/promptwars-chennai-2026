@@ -1,4 +1,5 @@
 import { generateStructured, MODELS } from "../openai";
+import { LANGUAGES } from "../languages";
 import { getResource, isResourceId, resourceCatalogForPrompt } from "../resources";
 import { getButton, route, type RouteResult } from "../safety-router";
 import {
@@ -122,6 +123,9 @@ function buildUserPrompt(input: InterveneRequest, routed: RouteResult): string {
       ? `Their trusted contact is saved as "${ctx.trustedContactLabel}".`
       : "",
     ctx?.preferredCoping ? `Coping style that works for them: ${ctx.preferredCoping}.` : "",
+    input.language !== "en"
+      ? `Write EVERY user-facing sentence in ${LANGUAGES[input.language].name}, using simple everyday words a stressed reader understands. Keep phone numbers, helpline names, and resource ids unchanged.`
+      : "",
     "",
     "Verified resource catalog — resourceIds may ONLY come from here:",
     resourceCatalogForPrompt(audience),
@@ -216,6 +220,7 @@ export function compileResponse(
     widgets: widgets.slice(0, 5),
     generation,
     model: MODELS.main,
+    language: input.language,
   });
 }
 
@@ -245,6 +250,7 @@ export function emergencyResponse(input: InterveneRequest): AgentResponse {
     widgets,
     generation: "verified-protocol",
     model: null,
+    language: "en",
   });
 }
 
@@ -282,5 +288,6 @@ export function verifiedFallback(input: InterveneRequest, routed: RouteResult): 
     widgets,
     generation: "verified-protocol",
     model: null,
+    language: "en",
   });
 }

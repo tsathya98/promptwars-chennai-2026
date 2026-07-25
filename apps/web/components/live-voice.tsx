@@ -7,6 +7,7 @@ type SessionState = "idle" | "connecting" | "live" | "error";
 
 type Props = {
   mode: "individual" | "caregiver";
+  language?: string;
   onClose: () => void;
 };
 
@@ -17,7 +18,7 @@ type Props = {
  * Explicit states only — a failed connection says so and falls back to the
  * one-tap buttons, which always work.
  */
-export function LiveVoice({ mode, onClose }: Props) {
+export function LiveVoice({ mode, language = "en", onClose }: Props) {
   const [state, setState] = useState<SessionState>("idle");
   const [muted, setMuted] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -41,7 +42,7 @@ export function LiveVoice({ mode, onClose }: Props) {
       const tokenRes = await fetch("/api/realtime/token", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode }),
+        body: JSON.stringify({ mode, language }),
       });
       if (!tokenRes.ok) throw new Error("token");
       const { value, baseUrl, model } = (await tokenRes.json()) as {

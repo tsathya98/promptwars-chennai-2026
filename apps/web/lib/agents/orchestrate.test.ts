@@ -17,7 +17,11 @@ const baseIntent: ModelIntent = {
 describe("deterministic widget compiler", () => {
   it("compiles a recovery-coach intent into allow-listed widgets", () => {
     const routed = route({ mode: "individual", buttonId: "urge" });
-    const response = compileResponse({ mode: "individual", buttonId: "urge" }, routed, baseIntent);
+    const response = compileResponse(
+      { mode: "individual", buttonId: "urge", language: "en" },
+      routed,
+      baseIntent,
+    );
     const types = response.widgets.map((w) => w.type);
     expect(types).toContain("intervention-script");
     expect(types).toContain("breathing-guide");
@@ -29,7 +33,11 @@ describe("deterministic widget compiler", () => {
   it("rejects resource ids outside the verified registry instead of substituting", () => {
     const routed = route({ mode: "individual", buttonId: "urge" });
     const intent = { ...baseIntent, resourceIds: ["fake-helpline-999", "urge-grounding"] };
-    const response = compileResponse({ mode: "individual", buttonId: "urge" }, routed, intent);
+    const response = compileResponse(
+      { mode: "individual", buttonId: "urge", language: "en" },
+      routed,
+      intent,
+    );
     const resourceWidgets = response.widgets.filter((w) => w.type === "verified-resource");
     expect(resourceWidgets.map((w) => w.resourceId)).toEqual(["urge-grounding"]);
   });
@@ -38,7 +46,7 @@ describe("deterministic widget compiler", () => {
     const routed = route({ mode: "caregiver", buttonId: "start-conversation" });
     // resource-navigator/caregiver-guide have no breathing-guide in their allow-list
     const response = compileResponse(
-      { mode: "caregiver", buttonId: "start-conversation" },
+      { mode: "caregiver", buttonId: "start-conversation", language: "en" },
       routed,
       { ...baseIntent, caregiverGuidance: { sayThis: ["I care about you."], avoidThis: ["Blame."], warningSigns: ["Unresponsive."] } },
     );
@@ -47,7 +55,11 @@ describe("deterministic widget compiler", () => {
   });
 
   it("builds the emergency response with zero model dependency", () => {
-    const response = emergencyResponse({ mode: "caregiver", buttonId: "possible-overdose" });
+    const response = emergencyResponse({
+      mode: "caregiver",
+      buttonId: "possible-overdose",
+      language: "en",
+    });
     expect(response.generation).toBe("verified-protocol");
     expect(response.model).toBeNull();
     expect(response.riskLevel).toBe("emergency");
@@ -56,7 +68,10 @@ describe("deterministic widget compiler", () => {
 
   it("falls back to labelled verified protocol when generation fails", () => {
     const routed = route({ mode: "individual", buttonId: "urge" });
-    const response = verifiedFallback({ mode: "individual", buttonId: "urge" }, routed);
+    const response = verifiedFallback(
+      { mode: "individual", buttonId: "urge", language: "en" },
+      routed,
+    );
     expect(response.generation).toBe("verified-protocol");
     expect(response.widgets.every((w) => w.source === "verified")).toBe(true);
     expect(response.summary.toLowerCase()).toContain("unavailable");

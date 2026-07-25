@@ -98,12 +98,17 @@ export function requestLocationLink(): Promise<ConnectorResult & { link?: string
 
 /* ---------- Speech (browser TTS — audio never recorded or stored) ---------- */
 
-export function speak(text: string, onEnd?: () => void): ConnectorResult {
+export function speak(
+  text: string,
+  opts: { lang?: string; onEnd?: () => void } = {},
+): ConnectorResult {
+  const { lang = "en-IN", onEnd } = opts;
   if (!("speechSynthesis" in window)) {
     return { status: "failed", message: "Read-aloud isn't supported in this browser.", retryable: false };
   }
   window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = lang;
   utterance.rate = 0.9; // calm pacing
   utterance.pitch = 1.0;
   utterance.onend = () => onEnd?.();

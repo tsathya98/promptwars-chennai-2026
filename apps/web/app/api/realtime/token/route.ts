@@ -3,7 +3,25 @@ export const maxDuration = 30;
 /** Verified via live smoke test against the region-pinned host (2026-07-25). */
 const REALTIME_MODEL = "gpt-realtime";
 
-function voiceInstructions(mode: "individual" | "caregiver"): string {
+const LANGUAGE_NAMES: Record<string, string> = {
+  ta: "Tamil",
+  hi: "Hindi",
+  bn: "Bengali",
+  te: "Telugu",
+  mr: "Marathi",
+  kn: "Kannada",
+  ml: "Malayalam",
+};
+
+function voiceInstructions(mode: "individual" | "caregiver", language?: string): string {
+  const languageRule =
+    language && LANGUAGE_NAMES[language]
+      ? `\n- Speak in ${LANGUAGE_NAMES[language]}, in simple everyday words. Keep helpline numbers unchanged.`
+      : "";
+  return baseVoiceInstructions(mode) + languageRule;
+}
+
+function baseVoiceInstructions(mode: "individual" | "caregiver"): string {
   return `You are IBUKI Voice, the spoken companion of IBUKI Circle — a recovery-support app for adults in India navigating substance use${
     mode === "caregiver" ? ", currently speaking with a caregiver supporting someone" : ""
   }.
@@ -29,9 +47,11 @@ export async function POST(req: Request) {
   }
 
   let mode: "individual" | "caregiver" = "individual";
+  let language: string | undefined;
   try {
-    const body = (await req.json()) as { mode?: string };
+    const body = (await req.json()) as { mode?: string; language?: string };
     if (body?.mode === "caregiver") mode = "caregiver";
+    if (typeof body?.language === "string" && body.language.length <= 5) language = body.language;
   } catch {
     /* default mode */
   }
@@ -46,7 +66,7 @@ export async function POST(req: Request) {
         model: REALTIME_MODEL,
         output_modalities: ["audio"],
         audio: { output: { voice: "marin" } },
-        instructions: voiceInstructions(mode),
+        instructions: voiceInstructions(mode, language),
       },
     }),
   });

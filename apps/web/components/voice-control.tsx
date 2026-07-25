@@ -5,6 +5,8 @@ import { Mic, Square } from "lucide-react";
 
 type Props = {
   disabled?: boolean;
+  /** BCP-47 speech code, e.g. "en-IN", "ta-IN". */
+  lang?: string;
   onTranscript: (text: string) => void;
 };
 
@@ -16,7 +18,7 @@ type SpeechRecognitionLike = {
   stop: () => void;
   onresult: ((event: SpeechRecognitionEventLike) => void) | null;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
 };
 
 type SpeechRecognitionEventLike = {
@@ -24,16 +26,29 @@ type SpeechRecognitionEventLike = {
   results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }>;
 };
 
+/** Honest, user-visible explanations for recognition failures. */
+const ERROR_HINTS: Record<string, string> = {
+  "not-allowed": "Microphone permission is blocked — allow it in the address bar, or use the buttons.",
+  "service-not-allowed":
+    "This browser blocks speech-to-text (Brave does). Try Chrome/Edge — or use Live voice, which works here.",
+  network:
+    "This browser blocks speech-to-text (Brave does). Try Chrome/Edge — or use Live voice, which works here.",
+  "no-speech": "Didn't catch anything — tap Speak and try again.",
+  "audio-capture": "No microphone was found on this device.",
+};
+
 /**
  * Voice input via the browser Speech Recognition API. Feature-detected; the
  * one-tap buttons remain the primary zero-typing path when unsupported or when
  * microphone permission is declined. Audio and transcripts are never stored.
  */
-export function VoiceControl({ disabled, onTranscript }: Props) {
+export function VoiceControl({ disabled, lang = "en-IN", onTranscript }: Props) {
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
+  const [hint, setHint] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const gotResultRef = useRef(false);
   const onTranscriptRef = useRef(onTranscript);
   onTranscriptRef.current = onTranscript;
 
@@ -47,7 +62,6 @@ export function VoiceControl({ disabled, onTranscript }: Props) {
     setSupported(true);
 
     const recognition = new Ctor();
-    recognition.lang = "en-IN";
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.onresult = (event) => {
@@ -58,17 +72,27 @@ export function VoiceControl({ disabled, onTranscript }: Props) {
         if (result.isFinal) finalText += result[0].transcript;
         else interimText += result[0].transcript;
       }
-      if (interimText) setInterim(interimText);
+      if (interimText) {
+        gotResultRef.current = true;
+        setInterim(interimText);
+      }
       if (finalText.trim()) {
+        gotResultRef.current = true;
         setInterim("");
         recognition.stop();
         onTranscriptRef.current(finalText.trim());
       }
     };
-    recognition.onend = () => setListening(false);
-    recognition.onerror = () => {
+    recognition.onend = () => {
+      setListening(false);
+      if (!gotResultRef.current) {
+        setHint((h) => h ?? ERROR_HINTS["no-speech"]);
+      }
+    };
+    recognition.onerror = (event) => {
       setListening(false);
       setInterim("");
+      setHint(ERROR_HINTS[event.error ?? ""] ?? "Voice input hit a snag — the buttons always work.");
     };
     recognitionRef.current = recognition;
     return () => {
@@ -93,24 +117,28 @@ export function VoiceControl({ disabled, onTranscript }: Props) {
       setListening(false);
     } else {
       setInterim("");
+      setHint(null);
+      gotResultRef.current = false;
+      recognition.lang = lang;
       try {
         recognition.start();
         setListening(true);
       } catch {
         setListening(false);
+        setHint("Voice input couldn't start — the buttons always work.");
       }
     }
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2">
       <button
         type="button"
         onClick={toggle}
         disabled={disabled}
         aria-pressed={listening}
         aria-label={listening ? "Stop listening" : "Speak instead of typing"}
-        className={`flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors disabled:opacity-50 ${
+        className={`flex min-h-12 min-w-12 shrink-0 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors disabled:opacity-50 ${
           listening
             ? "border-[var(--teal)] bg-[var(--teal)]/15 text-[var(--teal)]"
             : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)] hover:text-[var(--text)]"
@@ -127,8 +155,13 @@ export function VoiceControl({ disabled, onTranscript }: Props) {
         <span className="hidden sm:inline">{listening ? "Listening…" : "Speak"}</span>
       </button>
       {interim && (
-        <span className="max-w-48 truncate text-sm italic text-[var(--text-soft)]" aria-live="polite">
+        <span className="min-w-0 truncate text-sm italic text-[var(--text-soft)]" aria-live="polite">
           “{interim}”
+        </span>
+      )}
+      {hint && !interim && (
+        <span className="min-w-0 text-xs leading-tight text-[var(--amber)]" role="status">
+          {hint}
         </span>
       )}
     </div>

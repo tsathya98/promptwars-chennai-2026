@@ -1,7 +1,12 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import type { ComponentType, SVGProps } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type {
+  ComponentType,
+  CSSProperties,
+  PointerEvent as ReactPointerEvent,
+  SVGProps,
+} from "react";
 import {
   AudioLines,
   Flame,
@@ -14,7 +19,9 @@ import {
   RotateCcw,
   Send,
   ShieldAlert,
+  ShieldCheck,
   Siren,
+  Sparkles,
   Users,
   Waves,
 } from "lucide-react";
@@ -25,8 +32,9 @@ import { VoiceControl } from "@/components/voice-control";
 import { Widget, WidgetCanvas } from "@/components/widget-renderer";
 import { AGENTS } from "@/lib/agents/registry";
 import { buildTelLink } from "@/lib/connectors";
+import { LANGUAGE_CODES, LANGUAGES, type LanguageCode } from "@/lib/languages";
 import { COMMAND_BUTTONS, type ActorMode } from "@/lib/safety-router";
-import type { InterveneRequest } from "@/lib/schemas";
+import type { InterveneRequestInput } from "@/lib/schemas";
 import { useIntervene } from "@/lib/use-intervene";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -59,21 +67,66 @@ const GENERATION_LABEL = {
   mixed: "AI-personalized · includes verified actions",
 } as const;
 
+const HOW_IT_WORKS = [
+  {
+    kicker: "route",
+    title: "Deterministic safety first",
+    body: "Every tap, sentence, or voice note passes a safety router. Emergencies get verified 112 guidance instantly — no AI in the path.",
+    icon: ShieldCheck,
+  },
+  {
+    kicker: "generate",
+    title: "One specialist, one model call",
+    body: "A recovery specialist personalizes your plan with gpt-5.6-terra — schema-validated twice before anything renders.",
+    icon: Sparkles,
+  },
+  {
+    kicker: "act",
+    title: "Real actions, honestly reported",
+    body: "Call, message, breathe, share — every action opens your own apps and says “opened”, never “sent”.",
+    icon: HeartHandshake,
+  },
+] as const;
+
+const VERIFIED_CHIPS = [
+  "112 · Emergency (ERSS)",
+  "14446 · De-addiction helpline",
+  "14416 · Tele-MANAS",
+] as const;
+
 export default function Home() {
   const [mode, setMode] = useState<ActorMode>("individual");
   const [draft, setDraft] = useState("");
   const [liveVoiceOpen, setLiveVoiceOpen] = useState(false);
+  const [language, setLanguage] = useState<LanguageCode>("en");
   const { events, response, status, error, intervene, reset } = useIntervene();
-  const lastRequest = useRef<InterveneRequest | null>(null);
+  const lastRequest = useRef<InterveneRequestInput | null>(null);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("ibuki-language");
+    if (saved && saved in LANGUAGES) setLanguage(saved as LanguageCode);
+  }, []);
+
+  const changeLanguage = (code: LanguageCode) => {
+    setLanguage(code);
+    window.localStorage.setItem("ibuki-language", code);
+  };
 
   const crisis = response?.riskLevel === "emergency";
   const working = status === "working";
   const buttons = useMemo(() => COMMAND_BUTTONS.filter((b) => b.mode === mode), [mode]);
   const agent = response ? AGENTS[response.agentId] : null;
 
-  const run = (request: InterveneRequest) => {
-    lastRequest.current = request;
-    void intervene(request);
+  const run = (request: InterveneRequestInput) => {
+    const withLanguage = { ...request, language };
+    lastRequest.current = withLanguage;
+    void intervene(withLanguage);
+  };
+
+  const spot = (e: ReactPointerEvent<HTMLButtonElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
   };
 
   const submitText = (text: string) => {
@@ -89,6 +142,12 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-x-hidden">
       {!crisis && <CursorField />}
+      {!crisis && (
+        <>
+          <div aria-hidden className="orb absolute -top-36 right-[-110px]" />
+          <div aria-hidden className="orb orb-violet absolute bottom-[-170px] left-[-140px]" />
+        </>
+      )}
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-4 py-6 md:py-10">
         {/* Fixed safety shell: brand + always-available emergency action */}
@@ -101,16 +160,37 @@ export default function Home() {
             <p className="mt-1 text-sm text-[var(--text-soft)]">
               One breath. One tap. Your circle responds.
             </p>
+            <p className="mt-2 flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-soft)] opacity-80">
+              <span aria-hidden className="dot-working h-1.5 w-1.5 rounded-full bg-[var(--teal)]" />
+              live · gpt-5.6-terra + gpt-realtime
+            </p>
           </div>
           {!crisis && (
-            <button
-              type="button"
-              onClick={emergencyNow}
-              className="flex min-h-14 items-center gap-2 rounded-xl border-2 border-[var(--crisis)] bg-[var(--crisis)]/15 px-5 font-bold text-[var(--crisis-soft)] transition-colors hover:bg-[var(--crisis)]/30"
-            >
-              <Siren className="h-5 w-5" aria-hidden />
-              Emergency help
-            </button>
+            <div className="flex items-center gap-2.5">
+              <label className="sr-only" htmlFor="language-select">
+                Response language
+              </label>
+              <select
+                id="language-select"
+                value={language}
+                onChange={(e) => changeLanguage(e.target.value as LanguageCode)}
+                className="min-h-11 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--text-soft)] focus:border-[var(--teal)] focus:outline-none"
+              >
+                {LANGUAGE_CODES.map((code) => (
+                  <option key={code} value={code}>
+                    {LANGUAGES[code].label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={emergencyNow}
+                className="flex min-h-14 items-center gap-2 rounded-xl border-2 border-[var(--crisis)] bg-[var(--crisis)]/15 px-5 font-bold text-[var(--crisis-soft)] transition-colors hover:bg-[var(--crisis)]/30"
+              >
+                <Siren className="h-5 w-5" aria-hidden />
+                Emergency help
+              </button>
+            </div>
           )}
         </header>
 
@@ -177,7 +257,9 @@ export default function Home() {
 
             {/* Zero-typing command dock */}
             <section aria-label="One-tap support commands" className="flex flex-col gap-3">
-              <h2 className="text-lg font-bold md:text-xl">What do you need right now?</h2>
+              <h2 className="hero-serif text-3xl leading-tight md:text-[42px]">
+                What do you need <span className="text-[var(--teal)]">right now</span>?
+              </h2>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
                 {buttons.map((btn) => {
                   const ButtonIcon = BUTTON_ICONS[btn.id] ?? ShieldAlert;
@@ -188,21 +270,32 @@ export default function Home() {
                       type="button"
                       disabled={working}
                       onClick={() => run({ mode, buttonId: btn.id })}
-                      className={`flex min-h-[76px] items-start gap-3 rounded-2xl border p-4 text-left transition-colors disabled:opacity-50 ${
+                      onPointerMove={spot}
+                      style={
+                        {
+                          "--r": "170px",
+                          ...(isEmergency ? { "--accent": "var(--crisis)" } : {}),
+                        } as CSSProperties
+                      }
+                      className={`spotlight relative flex min-h-[84px] items-start gap-3.5 overflow-hidden rounded-2xl border p-4 text-left transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 ${
                         isEmergency
-                          ? "border-[var(--crisis)]/50 bg-[var(--crisis)]/10 hover:border-[var(--crisis)] hover:bg-[var(--crisis)]/20"
-                          : "border-[var(--line)] bg-[var(--surface)]/70 hover:border-[var(--teal)]/60 hover:bg-[var(--surface-hi)]/70"
+                          ? "border-[var(--crisis)]/50 bg-[var(--crisis)]/10 hover:border-[var(--crisis)]"
+                          : "border-[var(--line)] bg-[var(--surface)]/80 hover:border-[var(--teal)]/50"
                       }`}
                     >
-                      <ButtonIcon
+                      <span
                         aria-hidden
-                        className={`mt-0.5 h-5 w-5 shrink-0 ${
-                          isEmergency ? "text-[var(--crisis-soft)]" : "text-[var(--teal)]"
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                          isEmergency
+                            ? "bg-[var(--crisis)]/20 text-[var(--crisis-soft)]"
+                            : "bg-[var(--teal)]/12 text-[var(--teal)]"
                         }`}
-                      />
+                      >
+                        <ButtonIcon className="h-5 w-5" />
+                      </span>
                       <span>
-                        <span className="block text-sm font-bold leading-snug">{btn.label}</span>
-                        <span className="mt-0.5 block text-xs leading-snug text-[var(--text-soft)]">
+                        <span className="block text-[15px] font-bold leading-snug">{btn.label}</span>
+                        <span className="mt-1 block text-xs leading-snug text-[var(--text-soft)]">
                           {btn.description}
                         </span>
                       </span>
@@ -220,7 +313,11 @@ export default function Home() {
               }}
               className="flex items-center gap-2"
             >
-              <VoiceControl disabled={working} onTranscript={submitText} />
+              <VoiceControl
+                disabled={working}
+                lang={LANGUAGES[language].speech}
+                onTranscript={submitText}
+              />
               <button
                 type="button"
                 onClick={() => setLiveVoiceOpen((v) => !v)}
@@ -257,7 +354,9 @@ export default function Home() {
               </button>
             </form>
 
-            {liveVoiceOpen && <LiveVoice mode={mode} onClose={() => setLiveVoiceOpen(false)} />}
+            {liveVoiceOpen && (
+              <LiveVoice mode={mode} language={language} onClose={() => setLiveVoiceOpen(false)} />
+            )}
 
             {/* Result canvas + activity rail */}
             {(working || response || error) && (
@@ -326,15 +425,40 @@ export default function Home() {
             )}
 
             {status === "idle" && (
-              <div className="surface flex flex-col items-center gap-2 p-8 text-center">
-                <p className="text-base font-semibold">
-                  Tap a button, speak, or type — whatever is easiest right now.
-                </p>
-                <p className="max-w-md text-sm text-[var(--text-soft)]">
-                  A specialist prepares a personalized plan with real-time AI. Emergencies always
-                  get verified guidance instantly, with no AI in the way.
-                </p>
-              </div>
+              <section aria-label="How IBUKI Circle works" className="flex flex-col gap-4">
+                <div className="grid gap-3 md:grid-cols-3">
+                  {HOW_IT_WORKS.map((step, i) => {
+                    const StepIcon = step.icon;
+                    return (
+                      <div
+                        key={step.kicker}
+                        className="surface reveal p-5"
+                        style={{ animationDelay: `${i * 90}ms` }}
+                      >
+                        <p className="kicker mb-3">
+                          0{i + 1} · {step.kicker}
+                        </p>
+                        <p className="mb-2 flex items-center gap-2 text-[15px] font-bold">
+                          <StepIcon className="h-4 w-4 text-[var(--teal)]" aria-hidden />
+                          {step.title}
+                        </p>
+                        <p className="text-sm leading-relaxed text-[var(--text-soft)]">{step.body}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="kicker">[ Verified sources ]</span>
+                  {VERIFIED_CHIPS.map((chip) => (
+                    <span
+                      key={chip}
+                      className="rounded-full border border-[var(--line)] px-3 py-1 text-xs text-[var(--text-soft)]"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </section>
             )}
           </>
         )}

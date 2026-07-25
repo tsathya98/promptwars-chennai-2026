@@ -5,7 +5,7 @@ import type {
   ActivityEvent,
   AgentResponse,
   InterveneFrame,
-  InterveneRequest,
+  InterveneRequestInput,
 } from "./schemas";
 
 export type InterveneStatus = "idle" | "working" | "done" | "error";
@@ -37,7 +37,7 @@ export function useIntervene() {
     setStatus("idle");
   }, []);
 
-  const intervene = useCallback(async (request: InterveneRequest) => {
+  const intervene = useCallback(async (request: InterveneRequestInput) => {
     abortRef.current?.abort();
     const ac = new AbortController();
     abortRef.current = ac;

@@ -28,6 +28,7 @@ import {
   stopSpeaking,
   type ConnectorResult,
 } from "@/lib/connectors";
+import { LANGUAGES } from "@/lib/languages";
 import { getResource } from "@/lib/resources";
 import type { AgentResponse, WidgetSpec } from "@/lib/schemas";
 import { SpotlightCard } from "./spotlight-card";
@@ -68,7 +69,13 @@ function WidgetShell({ children, className = "" }: { children: React.ReactNode; 
   );
 }
 
-function InterventionScript({ spec }: { spec: Extract<WidgetSpec, { type: "intervention-script" }> }) {
+function InterventionScript({
+  spec,
+  speechLang,
+}: {
+  spec: Extract<WidgetSpec, { type: "intervention-script" }>;
+  speechLang: string;
+}) {
   const [speaking, setSpeaking] = useState(false);
   const [fewerWords, setFewerWords] = useState(false);
   const fullText = `${spec.acknowledgement} ${spec.steps.join(". ")}`;
@@ -78,7 +85,7 @@ function InterventionScript({ spec }: { spec: Extract<WidgetSpec, { type: "inter
       stopSpeaking();
       setSpeaking(false);
     } else {
-      const result = speak(fullText, () => setSpeaking(false));
+      const result = speak(fullText, { lang: speechLang, onEnd: () => setSpeaking(false) });
       setSpeaking(result.status !== "failed");
     }
   };
@@ -360,10 +367,18 @@ function VerifiedResourceCard({ spec }: { spec: Extract<WidgetSpec, { type: "ver
 }
 
 /** Closed-vocabulary renderer: unknown nodes surface visibly, never silently. */
-export function Widget({ spec, emergency = false }: { spec: WidgetSpec; emergency?: boolean }) {
+export function Widget({
+  spec,
+  emergency = false,
+  speechLang = "en-IN",
+}: {
+  spec: WidgetSpec;
+  emergency?: boolean;
+  speechLang?: string;
+}) {
   switch (spec.type) {
     case "intervention-script":
-      return <InterventionScript spec={spec} />;
+      return <InterventionScript spec={spec} speechLang={speechLang} />;
     case "breathing-guide":
       return (
         <WidgetShell>
@@ -399,6 +414,7 @@ const FULL_WIDTH_TYPES = new Set<WidgetSpec["type"]>(["intervention-script", "ca
 
 export function WidgetCanvas({ response }: { response: AgentResponse }) {
   const emergency = response.riskLevel === "emergency";
+  const speechLang = LANGUAGES[response.language]?.speech ?? "en-IN";
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {response.widgets.map((spec, i) => (
@@ -407,7 +423,7 @@ export function WidgetCanvas({ response }: { response: AgentResponse }) {
           className={`reveal ${FULL_WIDTH_TYPES.has(spec.type) ? "md:col-span-2" : ""}`}
           style={{ animationDelay: `${i * 90}ms` }}
         >
-          <Widget spec={spec} emergency={emergency} />
+          <Widget spec={spec} emergency={emergency} speechLang={speechLang} />
         </div>
       ))}
     </div>

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { LANGUAGE_CODES } from "./languages";
+
 /**
  * Closed vocabularies — agents select from validated IDs; deterministic
  * application code performs every real-world action.
@@ -95,6 +97,8 @@ export const agentResponseSchema = z.object({
   /** How this response was produced — always shown to the user, never faked. */
   generation: z.enum(["ai", "verified-protocol", "mixed"]),
   model: z.string().nullable(),
+  /** Language of the response content (verified protocols are always "en"). */
+  language: z.enum(LANGUAGE_CODES),
 });
 export type AgentResponse = z.infer<typeof agentResponseSchema>;
 
@@ -118,12 +122,15 @@ export const interveneRequestSchema = z
     mode: z.enum(["individual", "caregiver"]),
     buttonId: z.string().max(64).optional(),
     text: z.string().trim().min(1).max(2000).optional(),
+    language: z.enum(LANGUAGE_CODES).default("en"),
     context: interveneContextSchema.optional(),
   })
   .refine((v) => Boolean(v.buttonId || v.text), {
     message: "Provide a buttonId (one-tap) or text (voice or typed transcript).",
   });
 export type InterveneRequest = z.infer<typeof interveneRequestSchema>;
+/** Client-side shape: `language` may be omitted (defaults to "en" on parse). */
+export type InterveneRequestInput = z.input<typeof interveneRequestSchema>;
 
 /**
  * What the model authors: intent, not pixels. Deterministic code compiles
