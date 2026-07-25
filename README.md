@@ -97,7 +97,7 @@ The page provides a one-tap **Fill** button and a **Continue as guest** option, 
 
 The recovery workflow does not depend on one model vendor. `lib/model-provider.ts` is the only provider-selection boundary used by the intervention orchestrator.
 
-1. `MODEL_PROVIDER=openai|gemini` chooses the preferred structured-generation provider.
+1. `MODEL_PROVIDER=openai|gemini` chooses the preferred structured-generation provider; OpenAI is the default when it is unset.
 2. OpenAI and Gemini receive the same specialist instructions, resource catalog, user context, and strict intent contract.
 3. Both providers must return the same seven-field JSON object.
 4. The response is parsed through the same Zod schema.
@@ -237,7 +237,7 @@ Every tap, speech-recognition transcript, and typed request uses the same compac
 {
   "mode": "individual",
   "buttonId": "urge",
-  "language": "ta",
+  "language": "en",
   "context": {
     "alone": true,
     "setting": "home",
@@ -251,7 +251,7 @@ Every tap, speech-recognition transcript, and typed request uses the same compac
 ```json
 {"type":"activity","event":{"stage":"routing","status":"working","label":"Safety router assessing the situation"}}
 {"type":"activity","event":{"stage":"generation","status":"complete","label":"Recovery Coach plan generated"}}
-{"type":"response","response":{"agentId":"recovery-coach","riskLevel":"urgent","generation":"mixed","model":"<provider-selected model>","language":"ta","widgets":["<1-5 validated widget specs>"]}}
+{"type":"response","response":{"agentId":"recovery-coach","riskLevel":"urgent","summary":"A short plan for this moment.","widgets":[{"type":"intervention-script","source":"ai","acknowledgement":"You did the right thing by reaching out.","steps":["Move to a different room."]},{"type":"safety-actions","source":"verified","resourceIds":["deaddiction-14446","telemanas-14416"],"note":"Free, confidential helplines."}],"generation":"mixed","model":"gemini-3.6-flash","language":"en"}}
 ```
 
 Activity frames report the real `routing`, `generation`, and `validation` stages; the client appends its real `rendering` stage when widgets mount. Connector controls report their own observable result beside the action. The final response contains the selected agent, risk level, generation provenance, actual model label or `null`, language, summary, and one to five validated widget specifications.
@@ -296,6 +296,7 @@ Phone numbers and safety guidance come from a versioned in-code registry reviewe
 ## Privacy, security, and responsible AI
 
 - **No application database:** this hackathon build does not persist transcripts, live audio, coordinates, phone numbers, circle messages, crisis history, or health information.
+- **Minimal demo session:** access uses only a one-day `HttpOnly`, `Secure`, `SameSite=Lax` cookie; there is no user profile or account database.
 - **Server-side provider secrets:** standard OpenAI and Gemini API keys remain on the server.
 - **Ephemeral live-voice access:** the browser receives only a 10-minute Realtime client token, never the standard OpenAI key; the user explicitly starts, mutes, and ends microphone access.
 - **Consent at action time:** browser location is requested only when a user chooses to add it to a message.
@@ -327,7 +328,7 @@ The interface is deliberately calm, high-contrast, and action-first:
 |---|---|
 | **Code quality — high impact** | Typed specialist registry, one orchestrator, provider adapters behind one interface, closed widget/connector vocabularies, shared schemas, small focused modules, and deterministic compilation |
 | **Problem alignment — high impact** | All five challenge pillars map to working evaluator flows: zero typing, personalized scripts, contextual safety, caregiver/education support, and connected multimodal actions |
-| **Security — medium impact** | Server-only long-lived keys, short-lived Realtime credentials, no sensitive database, no response cache, explicit consent, safe connector states, security headers, production dependency audit, and Gitleaks |
+| **Security — medium impact** | Server-only long-lived keys, short-lived Realtime credentials, minimal `HttpOnly` demo session, no sensitive database, no response cache, explicit consent, safe connector states, security headers, production dependency audit, and Gitleaks |
 | **Efficiency — medium impact** | One structured generation call for non-emergencies, low reasoning/thinking modes, streamed activity, provider failover without a second orchestration path, static page shell, and zero model latency on Level 1 |
 | **Testing — tie-breaker** | 18 focused unit tests cover request and response schemas, safety routing, emergency independence, deterministic compilation, verified fallback behavior, resource rejection, and connector URL construction |
 | **Accessibility — tie-breaker** | Keyboard focus, semantic controls, 48 px or larger primary targets, live status announcements, reduced-motion support, provider-neutral source labels, and simplified emergency presentation |
@@ -342,6 +343,7 @@ The interface is deliberately calm, high-contrast, and action-first:
 | Safety and orchestration | TypeScript deterministic router and typed specialist registry | Emergency independence, predictable routing, and reviewable policy |
 | Structured output | Strict JSON Schema plus Zod 4 | API-level shape enforcement followed by runtime validation |
 | Multilingual experience | Eight language codes with live generation and BCP-47 speech locales | One shared journey across text, browser speech, live voice, and read-aloud |
+| Evaluator access | Server-validated demo credentials, one-tap guest route, and cookie-gated page | Satisfies evaluator access without collecting identity or blocking emergency information |
 | Application | Next.js 16 App Router and React 19 | UI, server routes, streaming, and standalone deployment |
 | Styling | Tailwind CSS 4 and semantic CSS tokens | Consistent high-contrast, low-cognitive-load presentation |
 | Browser capabilities | Speech Recognition, Speech Synthesis, Web Share, Geolocation, `tel:`, SMS, and WhatsApp links | Multimodal input/output and explicit user-controlled actions |
@@ -357,13 +359,18 @@ Verified locally against the current implementation:
 |---|---|---|
 | `pnpm nx test web` | **18 tests passing across 4 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
 | `pnpm nx lint web` | **0 errors** | Next.js, React, TypeScript, hooks, and accessibility linting; two non-blocking cursor-animation warnings remain |
-| `pnpm nx build web` | **Passing production build** | Next.js 16 compilation, TypeScript checking, static generation, and route construction |
+| `pnpm nx build web` | **Passing production build** | Next.js 16 compilation, TypeScript checking, static generation, and all application/API routes |
 | `pnpm audit --prod --audit-level=high` | **No known vulnerabilities found** | Production dependency audit |
+| Deployed smoke check | **Passing** | `/` redirects to `/login`; demo login and guest entry return 200 with secure session cookies; `/api/health` returns `{ "ok": true }` |
+| Repository size | **Approximately 1.5 MiB of local Git metadata** | Comfortably below the challenge’s 10 MB repository limit |
 | GitHub Actions | **Configured** | Frozen install, guidance mirror check, lint, test, production audit, build, concurrency cancellation, and secret scan |
 
 The production application exposes:
 
-- `/` — intervention experience;
+- `/` — cookie-gated intervention experience;
+- `/login` — public evaluator entry with demo and guest paths;
+- `/api/auth/login` — validates published demo credentials server-side;
+- `/api/auth/guest` — creates a no-registration guest session;
 - `/api/intervene` — validated NDJSON intervention pipeline;
 - `/api/realtime/token` — short-lived credential for live voice; and
 - `/api/health` — live model, latency, specialist count, resource count, and registry version check.
@@ -373,18 +380,28 @@ The production application exposes:
 ```text
 apps/web/
 ├── app/
+│   ├── api/auth/             # demo login and one-tap guest session routes
 │   ├── api/intervene/        # validated streaming intervention endpoint
 │   ├── api/realtime/token/   # ephemeral live-voice token endpoint
 │   ├── api/health/           # live model and registry health check
-│   └── page.tsx              # individual, caregiver, emergency, and voice UI
-├── components/               # widget canvas, voice, activity, and motion UI
+│   ├── login/                # evaluator access UI and visible 112 escape hatch
+│   └── page.tsx              # server-side access gate
+├── components/
+│   ├── home-client.tsx       # individual, caregiver, emergency, and voice UI
+│   ├── live-voice.tsx        # WebRTC conversation and typed tool handling
+│   └── ...                   # widget canvas, speech, activity, and motion UI
 └── lib/
     ├── agents/               # typed specialist registry and orchestrator
+    ├── model-provider.ts     # OpenAI/Gemini selection and cross-provider fallback
+    ├── openai.ts             # Responses API wrapper and retry policy
+    ├── gemini.ts             # Gemini structured-output adapter
+    ├── voice-tools.ts        # five allow-listed voice-to-screen tools
+    ├── languages.ts          # eight languages and browser speech locales
     ├── safety-router.ts      # deterministic risk routing
     ├── schemas.ts            # closed vocabularies and validation contracts
     ├── resources.ts          # reviewed safety/resource registry
     ├── connectors.ts         # user-confirmed browser actions
-    └── openai.ts             # Responses API wrapper and retry policy
+    └── demo-auth.ts          # minimal cookie construction for evaluator access
 ```
 
 The detailed product and architecture plan is available in [`docs/07-ibuki-circle-plan.md`](docs/07-ibuki-circle-plan.md).
@@ -395,14 +412,15 @@ The detailed product and architecture plan is available in [`docs/07-ibuki-circl
 
 - Node.js 22
 - pnpm 10
-- an OpenAI API key with access to the configured models
+- at least one configured structured-generation provider: OpenAI or Gemini
+- an OpenAI key as well if live speech-to-speech is required
 
 ### Setup
 
 ```bash
 pnpm install
 cp .env.example apps/web/.env.local
-# Add OPENAI_API_KEY to apps/web/.env.local
+# Configure one of the provider examples below
 pnpm nx dev web
 ```
 
@@ -425,19 +443,49 @@ pnpm audit --prod --audit-level=high
 
 | Variable | Required | Purpose |
 |---|---:|---|
-| `OPENAI_API_KEY` | Yes | Server-side credential for structured interventions, health checks, and ephemeral Realtime tokens |
-| `OPENAI_BASE_URL` | No | Defaults to the required region-pinned `https://us.api.openai.com/v1` host |
+| `MODEL_PROVIDER` | Recommended | `openai` or `gemini`; selects the preferred structured-generation provider |
+| `OPENAI_API_KEY` | Conditional | OpenAI structured interventions and health checks; also required for live speech-to-speech and Realtime client tokens |
+| `OPENAI_BASE_URL` | No | Defaults to this project’s verified region-pinned `https://us.api.openai.com/v1` host |
+| `GEMINI_API_KEY` | Conditional | Gemini structured interventions and health checks |
+| `DEMO_USERNAME` | No | Overrides the published demo username; defaults to `ibuki-demo` |
+| `DEMO_PASSWORD` | No | Overrides the published demo password; defaults to `circle2026` |
 
-There is no mock mode and no authentication wall. Evaluators can use every workflow directly in the deployed application.
+At least one provider key is required for personalized non-emergency interventions. Configure both provider keys to enable automatic cross-provider fallback. Live voice currently requires OpenAI even when Gemini is the primary intervention provider.
+
+OpenAI-primary example:
+
+```dotenv
+MODEL_PROVIDER=openai
+OPENAI_API_KEY=
+OPENAI_BASE_URL=https://us.api.openai.com/v1
+# Optional fallback:
+GEMINI_API_KEY=
+```
+
+Gemini-primary example:
+
+```dotenv
+MODEL_PROVIDER=gemini
+GEMINI_API_KEY=
+# Optional intervention fallback; required for Live voice:
+OPENAI_API_KEY=
+OPENAI_BASE_URL=https://us.api.openai.com/v1
+```
+
+There is no mock mode. Evaluators may use the published demo credentials or bypass registration with one-tap guest entry.
 
 ## Current scope and future vision
 
 ### Working in this submission
 
 - connected one-tap, typed, speech-recognition, read-aloud, and live-voice experiences;
+- five typed live-voice screen tools that render help or re-enter the safety pipeline;
+- live non-emergency generation in eight Indian languages, with localized speech input/output where browsers support it;
+- model-agnostic structured intervention generation across OpenAI and Gemini, including cross-provider fallback;
 - deterministic emergency routing and reviewed fallback content;
 - individual and caregiver journeys;
 - specialist, widget, and connector libraries;
+- evaluator demo access with a visible guest route and no account database;
 - official India-first helplines and reviewed educational resources;
 - responsive, keyboard-aware, reduced-motion-aware UI; and
 - public deployment, health endpoint, automated tests, CI, and security scanning.
@@ -448,10 +496,12 @@ There is no mock mode and no authentication wall. Evaluators can use every workf
 - It does not autonomously call, message, share location, or contact emergency services.
 - It does not claim a dialer/composer action was completed.
 - It does not persist profiles, health history, contacts, transcripts, or recovery records in this build.
+- It does not claim professionally reviewed emergency translations; verified emergency and degraded-mode protocols remain English.
+- The demo access cookie is not a production authentication or authorization system.
 
 ### Post-hackathon direction
 
-The three-library architecture is designed to grow safely: more reviewed specialist policies, localized widget packs, and consent-based connectors can be added without giving a model unrestricted UI or device control. Persistent care plans, authenticated circles, provider integrations, multilingual localization, and human-in-the-loop clinical review are future capabilities—not features claimed by this submission.
+The three-library architecture is designed to grow safely: more reviewed specialist policies, professionally localized emergency/resource packs, realtime-audio provider adapters, and consent-based connectors can be added without giving a model unrestricted UI or device control. Persistent care plans, production identity, authenticated trusted circles, treatment-provider integrations, and human-in-the-loop clinical review are future capabilities—not features claimed by this submission.
 
 ---
 

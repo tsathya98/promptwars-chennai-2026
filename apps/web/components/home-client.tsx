@@ -391,7 +391,7 @@ export default function Home() {
                 <div className="grid gap-4 md:grid-cols-2">
                   {voiceWidgets.map((spec, i) => (
                     <div key={`voice-${spec.type}-${i}`} className="reveal">
-                      <Widget spec={spec} speechLang={LANGUAGES[language].speech} />
+                      <Widget spec={spec} speechLang={LANGUAGES[language].speech} language={language} />
                     </div>
                   ))}
                 </div>

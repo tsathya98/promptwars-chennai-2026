@@ -96,9 +96,50 @@ export function requestLocationLink(): Promise<ConnectorResult & { link?: string
   });
 }
 
-/* ---------- Speech (browser TTS — audio never recorded or stored) ---------- */
+/* ---------- Speech (audio never recorded or stored by the app) ---------- */
 
-export function speak(
+let activeAudio: HTMLAudioElement | null = null;
+let activeUrl: string | null = null;
+
+/**
+ * Natural read-aloud: server TTS (calm, steerable voice) with browser
+ * speechSynthesis as the honest fallback when the request fails.
+ */
+export async function speak(
+  text: string,
+  opts: { lang?: string; language?: string; onEnd?: () => void } = {},
+): Promise<ConnectorResult> {
+  const { onEnd } = opts;
+  stopSpeaking();
+  try {
+    const res = await fetch("/api/speech", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text.slice(0, 800), language: opts.language }),
+    });
+    if (!res.ok) throw new Error(`speech ${res.status}`);
+    const url = URL.createObjectURL(await res.blob());
+    const audio = new Audio(url);
+    activeAudio = audio;
+    activeUrl = url;
+    const finish = () => {
+      if (activeUrl === url) {
+        URL.revokeObjectURL(url);
+        activeAudio = null;
+        activeUrl = null;
+      }
+      onEnd?.();
+    };
+    audio.onended = finish;
+    audio.onerror = finish;
+    await audio.play();
+    return { status: "opened", message: "Reading aloud.", retryable: true };
+  } catch {
+    return speakWithBrowser(text, opts);
+  }
+}
+
+function speakWithBrowser(
   text: string,
   opts: { lang?: string; onEnd?: () => void } = {},
 ): ConnectorResult {
@@ -118,5 +159,13 @@ export function speak(
 }
 
 export function stopSpeaking() {
+  if (activeAudio) {
+    activeAudio.onended = null;
+    activeAudio.onerror = null;
+    activeAudio.pause();
+    if (activeUrl) URL.revokeObjectURL(activeUrl);
+    activeAudio = null;
+    activeUrl = null;
+  }
   if ("speechSynthesis" in window) window.speechSynthesis.cancel();
 }

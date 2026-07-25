@@ -72,9 +72,11 @@ function WidgetShell({ children, className = "" }: { children: React.ReactNode; 
 function InterventionScript({
   spec,
   speechLang,
+  language,
 }: {
   spec: Extract<WidgetSpec, { type: "intervention-script" }>;
   speechLang: string;
+  language?: string;
 }) {
   const [speaking, setSpeaking] = useState(false);
   const [fewerWords, setFewerWords] = useState(false);
@@ -84,10 +86,14 @@ function InterventionScript({
     if (speaking) {
       stopSpeaking();
       setSpeaking(false);
-    } else {
-      const result = speak(fullText, { lang: speechLang, onEnd: () => setSpeaking(false) });
-      setSpeaking(result.status !== "failed");
+      return;
     }
+    setSpeaking(true);
+    void speak(fullText, { lang: speechLang, language, onEnd: () => setSpeaking(false) }).then(
+      (result) => {
+        if (result.status === "failed") setSpeaking(false);
+      },
+    );
   };
 
   return (
@@ -371,14 +377,16 @@ export function Widget({
   spec,
   emergency = false,
   speechLang = "en-IN",
+  language,
 }: {
   spec: WidgetSpec;
   emergency?: boolean;
   speechLang?: string;
+  language?: string;
 }) {
   switch (spec.type) {
     case "intervention-script":
-      return <InterventionScript spec={spec} speechLang={speechLang} />;
+      return <InterventionScript spec={spec} speechLang={speechLang} language={language} />;
     case "breathing-guide":
       return (
         <WidgetShell>
@@ -423,7 +431,7 @@ export function WidgetCanvas({ response }: { response: AgentResponse }) {
           className={`reveal ${FULL_WIDTH_TYPES.has(spec.type) ? "md:col-span-2" : ""}`}
           style={{ animationDelay: `${i * 90}ms` }}
         >
-          <Widget spec={spec} emergency={emergency} speechLang={speechLang} />
+          <Widget spec={spec} emergency={emergency} speechLang={speechLang} language={response.language} />
         </div>
       ))}
     </div>
