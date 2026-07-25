@@ -339,6 +339,7 @@ The interface is deliberately calm, high-contrast, and action-first:
 |---|---|---|
 | Personalized interventions | Model-agnostic provider layer: OpenAI Responses API (`gpt-5.6-terra`) or Google Gemini (`gemini-3.6-flash`) via `MODEL_PROVIDER`, with automatic cross-provider fallback | One structured model call per non-emergency intervention, optimized for latency; no single-vendor dependency |
 | Live conversation | OpenAI Realtime (`gpt-realtime`) over WebRTC | Low-latency speech-to-speech with a short-lived browser credential |
+| Natural read-aloud | OpenAI `gpt-4o-mini-tts` via `/api/speech`, calm steerable voice, language-aware | Warm, human-sounding script narration; browser speechSynthesis remains the honest fallback |
 | Voice-to-screen tools | Five typed Realtime function definitions plus `executeVoiceTool()` | Lets a spoken conversation render help while deterministic code retains control |
 | Safety and orchestration | TypeScript deterministic router and typed specialist registry | Emergency independence, predictable routing, and reviewable policy |
 | Structured output | Strict JSON Schema plus Zod 4 | API-level shape enforcement followed by runtime validation |
