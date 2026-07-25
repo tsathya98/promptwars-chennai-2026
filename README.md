@@ -61,7 +61,8 @@ curl localhost:3000/api/health   # verify health endpoint
 
 | Variable | Purpose |
 |---|---|
-| `OPEN_AI_API_KEY` | OpenAI API key for `gpt-5.6-terra` calls |
+| `OPENAI_API_KEY` | OpenAI API key for `gpt-5.6-terra` calls |
+| `OPENAI_BASE_URL` | Region-pinned host (`https://us.api.openai.com/v1`) — required, the default host 404s |
 
 ---
 

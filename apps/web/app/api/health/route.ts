@@ -1,19 +1,16 @@
-import { generate, MODELS } from "@/lib/gemini";
-import { ThinkingLevel } from "@google/genai";
+import { generate, MODELS } from "@/lib/openai";
 
 export async function GET() {
   const t0 = Date.now();
   try {
-    const res = await generate({
-      model: MODELS.fast,
-      contents: "ping — reply with the single word: pong",
-      config: { thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL } },
+    const res = await generate("ping — reply with the single word: pong", {
+      reasoningEffort: "minimal",
     });
     return Response.json({
       ok: true,
-      model: MODELS.fast,
+      model: MODELS.main,
       latencyMs: Date.now() - t0,
-      reply: res.text?.slice(0, 40),
+      reply: res.output_text?.slice(0, 40),
     });
   } catch (err) {
     return Response.json(
