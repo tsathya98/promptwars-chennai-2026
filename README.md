@@ -9,7 +9,8 @@
 [![Live Demo](https://img.shields.io/badge/TRY_LIVE_DEMO-IBUKI_CIRCLE-14B8A6?style=for-the-badge)](https://web-delta-three-92.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.11-000000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Tests](https://img.shields.io/badge/Vitest-18_passing-6E9F18?style=for-the-badge&logo=vitest)](#engineering-evidence)
-[![Model](https://img.shields.io/badge/OpenAI-gpt--5.6--terra-412991?style=for-the-badge&logo=openai)](#genai-and-technology-stack)
+[![Model Agnostic](https://img.shields.io/badge/Model_Agnostic-OpenAI_%7C_Gemini-7A77FF?style=for-the-badge)](#model-agnostic-by-design)
+[![Languages](https://img.shields.io/badge/Languages-8_Indian_languages-F5C84C?style=for-the-badge)](#multilingual-by-construction)
 
 **[Launch the deployed application](https://web-delta-three-92.vercel.app)**
 
@@ -23,15 +24,18 @@ Built for the **PromptWars Chennai 2026 Recovery & Prevention challenge**.
 
 Most support tools expect a person in distress to explain what is happening, search through information, and decide what to do next. Those are exactly the tasks that become hardest during a craving, panic episode, return to use, or suspected overdose.
 
-**IBUKI Circle turns one tap, a spoken phrase, or a short message into an immediate and actionable support flow.** It serves both the person seeking help and the caregiver supporting them. Generative AI personalizes recovery and caregiver guidance, while deterministic code controls emergency routing, verified resources, rendered UI, and every real-world action.
+**IBUKI Circle turns one tap, a spoken phrase, or a short message into an immediate and actionable support flow.** It serves both the person seeking help and the caregiver supporting them. A model-agnostic generation layer personalizes recovery and caregiver guidance, while deterministic code controls emergency routing, verified resources, rendered UI, and every real-world action.
 
 This is not a static information page and it is not an unrestricted chatbot. It is a working intervention pipeline with:
 
 - **12 one-tap commands** across individual and caregiver modes;
 - **two voice experiences**: speech-to-intervention and live speech-to-speech support;
+- **five allow-listed live-voice screen tools** that can place interactive help on screen while the conversation continues;
+- **eight response languages**: English, Tamil, Hindi, Bengali, Telugu, Marathi, Kannada, and Malayalam;
 - **four specialist profiles** selected by a deterministic safety router;
 - **six validated recovery widgets** rendered from a closed vocabulary;
 - **five consent-based connector capabilities** for calls, messages, sharing, location, and speech;
+- **two interchangeable structured-generation providers**, with automatic cross-provider fallback when both are configured;
 - **India-first emergency and support resources** from reviewed registries;
 - **a model-independent Level 1 emergency path** for immediate danger; and
 - **visible, real pipeline activity** without exposing hidden chain-of-thought.
@@ -53,28 +57,85 @@ When cognitive load is high:
 
 The challenge therefore requires one connected product that combines zero-typing access, personalized scripts, contextual safety, education, caregiver guidance, and multimodal interaction. IBUKI Circle implements that full journey rather than presenting disconnected AI demos.
 
+## Demo access
+
+The application build includes a lightweight demo access gate. Credential comparison happens in the server route; the evaluator credentials are deliberately public and printed in the login UI:
+
+| Field | Value |
+|---|---|
+| Username | `ibuki-demo` |
+| Password | `circle2026` |
+
+The page provides a one-tap **Fill** button and a **Continue as guest** option, so an evaluator is never blocked by account setup. Successful entry creates a one-day `HttpOnly`, `Secure`, `SameSite=Lax` demo-session cookie. This is intentionally a hackathon access gate rather than a production identity system; the login screen keeps the 112 emergency link visible.
+
 ## What an evaluator can test immediately
 
 | Scenario | What to do | Observable result | Runtime path |
 |---|---|---|---|
+| Evaluator entry | Choose **Continue as guest**, or fill the published demo credentials | Immediate access without registration, while the emergency number remains visible before entry | Server route → demo-session cookie → protected application page |
 | Strong craving | Tap **I'm having a strong urge** | A personalized short plan, optional paced breathing, a prepared circle message, and verified human-support actions | Deterministic routing → Recovery Coach → strict structured output |
 | Panic or overwhelm | Tap **I'm panicking or overwhelmed** | Low-cognitive-load grounding steps that can be read aloud | Recovery Coach → validated widget canvas → browser speech |
 | Return to use | Tap **I returned to use** | Non-stigmatizing next steps focused on immediate safety | Recovery Coach with explicit person-first rules |
 | Caregiver conversation | Select **I'm supporting someone**, then tap **Help me start a conversation** | What to say, what to avoid, warning signs, and verified caregiver resources | Caregiver Guide → caregiver-specific widgets |
 | Suspected overdose | Tap **Possible overdose / danger** or **Possible overdose** | The UI switches to a focused emergency view with **Call 112 now** and reviewed response steps | Level 1 Safety Guardian → deterministic verified protocol; no model call |
 | Spoken intervention | Tap the microphone and speak a situation | The transcript enters the same `/api/intervene` safety pipeline as typed text | Browser speech recognition → server safety router |
-| Live voice support | Open **Live voice** and start a conversation | A low-latency speech-to-speech session with visible connection, mute, retry, and end states | Short-lived server token → WebRTC → OpenAI Realtime |
+| Live voice + screen action | Open **Live voice**, describe an urge, and ask for breathing or a support message | The conversation continues while a validated breathing guide, editable message, helpline card, or full support plan appears on screen | Short-lived token → WebRTC → allow-listed tool call → Zod validation → deterministic React widget |
+| Language adaptation | Choose Tamil, Hindi, Bengali, Telugu, Marathi, Kannada, or Malayalam, then tap or speak | The non-emergency plan is generated live in the selected language; speech input and read-aloud use the matching locale | Language preference → shared request schema → active model provider → localized widgets |
 | Education or resources | Ask for a helpline, treatment resource, or explanation | Plain-language guidance with resources selected only from the verified catalog | Resource Navigator → allow-listed resource IDs |
 
 ## Direct alignment with all five functional pillars
 
 | Official challenge pillar | IBUKI Circle implementation | Evidence in the product |
 |---|---|---|
-| **1. Zero-Typing Interventions** | Large one-tap commands, emergency macro, browser speech recognition, live speech-to-speech, and read-aloud output | Every primary flow can begin without typing; controls are feature-detected and expose honest unsupported/error states |
+| **1. Zero-Typing Interventions** | Large one-tap commands, emergency macro, browser speech recognition, live speech-to-speech, voice-triggered screen tools, and read-aloud output | Every primary flow can begin without typing; controls are feature-detected and expose honest unsupported/error states |
 | **2. Personalized Emergency Scripts** | The model creates structured intent using the selected specialist, actor mode, situation, and optional context | A single live model call produces short acknowledgements, steps, breathing parameters, caregiver guidance, and circle-message intent |
 | **3. Contextual Safety Tools** | Three-level deterministic safety router, emergency phrase escalation, risk labels, verified protocols, and user-confirmed actions | Level 1 bypasses the model; urgent flows always add reviewed human-support options |
 | **4. Education & Caregiver Support** | Dedicated Caregiver Guide and Resource Navigator with person-first prompts and source-restricted resources | Switch modes to receive non-blaming scripts, warning signs, self-care guidance, and official helplines |
-| **5. Connected Multi-Modal Workflows** | Tap, text, voice transcript, live audio, visual widgets, speech synthesis, phone, messaging, share, and location work as connected journeys | Input is routed into a support plan; the plan becomes interactive widgets; widgets expose explicit next actions |
+| **5. Connected Multi-Modal Workflows** | Tap, text, voice transcript, live audio, visual widgets, speech synthesis, phone, messaging, share, and location work as connected journeys | Input is routed into a support plan; the plan becomes interactive widgets; live voice can place those widgets on screen; widgets expose explicit next actions |
+
+## Model-agnostic by design
+
+The recovery workflow does not depend on one model vendor. `lib/model-provider.ts` is the only provider-selection boundary used by the intervention orchestrator.
+
+1. `MODEL_PROVIDER=openai|gemini` chooses the preferred structured-generation provider.
+2. OpenAI and Gemini receive the same specialist instructions, resource catalog, user context, and strict intent contract.
+3. Both providers must return the same seven-field JSON object.
+4. The response is parsed through the same Zod schema.
+5. The same deterministic compiler enforces specialist, widget, length, number, and resource allow-lists.
+6. If the preferred provider fails and the second provider is configured, generation automatically retries through the second provider.
+7. The final server response records the model that actually produced the intent, while the product UI remains provider-neutral.
+
+| Capability | OpenAI adapter | Gemini adapter | Provider-independent boundary |
+|---|---|---|---|
+| Personalized intervention | Responses API using `gpt-5.6-terra` with low reasoning effort | `generateContent` using `gemini-3.6-flash` with low thinking | `generateIntent()` |
+| Structured-output enforcement | Strict `json_schema` response format | `responseMimeType: application/json` plus `responseJsonSchema` | `MODEL_INTENT_JSON_SCHEMA` + `modelIntentSchema` |
+| Runtime validation | Zod after API-level validation | Zod after API-level validation | Deterministic widget compiler |
+| Failure handling | Automatic retry for selected transient errors, then optional Gemini fallback | Optional OpenAI fallback | Source-labelled verified guidance if no provider succeeds |
+| Immediate emergency path | Not called | Not called | Deterministic Safety Guardian protocol |
+
+The current **live speech-to-speech adapter** uses OpenAI Realtime because that is the verified realtime transport in this submission. It is isolated behind `/api/realtime/token` and the typed screen-tool boundary; the core tap, text, speech-transcript, safety, widget, connector, and personalized-intervention architecture remains provider-independent.
+
+## Multilingual by construction
+
+Language is part of the request and response schema rather than a UI-only translation layer.
+
+| Language | Code | Browser speech locale |
+|---|---:|---:|
+| English | `en` | `en-IN` |
+| Tamil | `ta` | `ta-IN` |
+| Hindi | `hi` | `hi-IN` |
+| Bengali | `bn` | `bn-IN` |
+| Telugu | `te` | `te-IN` |
+| Marathi | `mr` | `mr-IN` |
+| Kannada | `kn` | `kn-IN` |
+| Malayalam | `ml` | `ml-IN` |
+
+- Non-emergency guidance is generated live in the selected language; it is not a bank of canned translations.
+- The language selection is carried through one-tap, typed, speech-recognition, and live-voice requests.
+- Browser speech recognition and read-aloud use the corresponding BCP-47 locale when supported.
+- Live voice receives the selected language as a session instruction and keeps verified helpline numbers unchanged.
+- The preference is the only item stored in `localStorage`; recovery content, transcripts, audio, and context are not persisted.
+- Reviewed emergency protocols and verified AI-failure fallbacks intentionally remain in English until professionally reviewed translations exist. The application does not machine-translate medical emergency steps and pretend they were verified.
 
 ## Product architecture: three controlled libraries
 
@@ -114,24 +175,42 @@ Each specialist declares an explicit widget allow-list and connector allow-list.
 
 Connector results use only observable states: `prepared`, `opened`, or `failed`.
 
+### Live-voice screen tools
+
+IBUKI Voice does more than speak. During a WebRTC conversation, the realtime model may request one of five named tools. `executeVoiceTool()` refuses unknown names, validates arguments, clamps numeric ranges, and translates the request into either an existing intervention request or a widget from the same closed vocabulary used everywhere else.
+
+| Realtime tool | Deterministic application action | Safety boundary |
+|---|---|---|
+| `show_support_plan` | Sends a bounded situation summary through `/api/intervene` | Re-enters the normal server-side safety router before generation |
+| `show_breathing_guide` | Renders the interactive breathing widget | Timing values are clamped and the widget passes `widgetSpecSchema` |
+| `prepare_circle_message` | Renders an editable message with user-controlled share actions | Message is bounded; the app never sends it or claims delivery |
+| `show_helplines` | Renders verified 14446 and 14416 call actions | IDs are fixed to the reviewed resource registry |
+| `show_emergency_help` | Triggers the same Level 1 emergency path as the red button | Renders 112 and reviewed steps with no intervention-model dependency |
+
+Tool results are returned to the voice session so it can narrate what appeared. The model never mounts React components, executes connector code, or bypasses the safety router.
+
 ## End-to-end architecture
 
 ```mermaid
 flowchart TB
     tap["One-tap command"] --> intervene["POST /api/intervene"]
-    transcript["Voice transcript"] --> intervene
+    transcript["Speech-recognition transcript"] --> intervene
     text["Typed situation"] --> intervene
+    voicePlan["Voice tool: show support plan"] --> intervene
 
-    intervene --> requestValidation["Request validation and size limits"]
+    intervene --> requestValidation["Request schema and size checks"]
     requestValidation --> safetyRouter["Deterministic safety router"]
 
     safetyRouter -->|"Level 1: immediate danger"| safetyGuardian["Safety Guardian"]
     safetyGuardian --> verifiedProtocol["Reviewed emergency protocol and India 112"]
 
     safetyRouter -->|"Levels 2 and 3"| specialist["Recovery Coach, Caregiver Guide, or Resource Navigator"]
-    specialist --> model["Model-agnostic structured intent (OpenAI or Gemini)"]
-    model --> schema["Strict JSON Schema and Zod validation"]
-    schema --> compiler["Deterministic widget compiler and allow-lists"]
+    specialist --> provider["Model-provider boundary"]
+    provider -->|"Preferred or fallback"| openai["OpenAI structured output"]
+    provider -->|"Preferred or fallback"| gemini["Gemini structured output"]
+    openai --> schema["Shared JSON Schema and Zod validation"]
+    gemini --> schema
+    schema --> compiler["Deterministic compiler and allow-lists"]
     compiler --> validatedWidgets["Validated widget specifications"]
 
     verifiedProtocol --> stream["NDJSON activity and response stream"]
@@ -141,7 +220,13 @@ flowchart TB
 
     liveVoice["Live speech-to-speech"] --> token["POST /api/realtime/token"]
     token --> ephemeral["Short-lived client token"]
-    ephemeral --> realtime["WebRTC session with gpt-realtime"]
+    ephemeral --> realtime["WebRTC session"]
+    realtime --> toolCall["One of five allow-listed screen tools"]
+    toolCall --> toolValidation["Typed validation and numeric clamps"]
+    toolValidation --> voiceWidgets["Breathing, message, or helpline widgets"]
+    toolValidation --> voicePlan
+    toolValidation -->|"Emergency tool"| safetyRouter
+    voiceWidgets --> canvas
 ```
 
 ### Intervention request and stream
@@ -152,6 +237,7 @@ Every tap, speech-recognition transcript, and typed request uses the same compac
 {
   "mode": "individual",
   "buttonId": "urge",
+  "language": "ta",
   "context": {
     "alone": true,
     "setting": "home",
@@ -160,7 +246,15 @@ Every tap, speech-recognition transcript, and typed request uses the same compac
 }
 ```
 
-`POST /api/intervene` streams newline-delimited JSON. Activity frames report the real `routing`, `generation`, `validation`, and `rendering` stages; connector controls then report their own observable result beside the action. The final response contains an agent ID, risk level, source label, model label, and one to five validated widget specifications.
+`POST /api/intervene` accepts either `buttonId` or bounded free text. It validates actor mode, language, optional context, maximum lengths, and the known request shape before orchestration. The endpoint then streams newline-delimited JSON:
+
+```json
+{"type":"activity","event":{"stage":"routing","status":"working","label":"Safety router assessing the situation"}}
+{"type":"activity","event":{"stage":"generation","status":"complete","label":"Recovery Coach plan generated"}}
+{"type":"response","response":{"agentId":"recovery-coach","riskLevel":"urgent","generation":"mixed","model":"<provider-selected model>","language":"ta","widgets":["<1-5 validated widget specs>"]}}
+```
+
+Activity frames report the real `routing`, `generation`, and `validation` stages; the client appends its real `rendering` stage when widgets mount. Connector controls report their own observable result beside the action. The final response contains the selected agent, risk level, generation provenance, actual model label or `null`, language, summary, and one to five validated widget specifications.
 
 ## Why this is safer than a general chatbot
 
@@ -202,12 +296,13 @@ Phone numbers and safety guidance come from a versioned in-code registry reviewe
 ## Privacy, security, and responsible AI
 
 - **No application database:** this hackathon build does not persist transcripts, live audio, coordinates, phone numbers, circle messages, crisis history, or health information.
-- **Server-side secrets:** the standard OpenAI API key is never sent to the browser.
-- **Ephemeral live-voice access:** the browser receives only a short-lived Realtime client token; the user explicitly starts and ends microphone access.
+- **Server-side provider secrets:** standard OpenAI and Gemini API keys remain on the server.
+- **Ephemeral live-voice access:** the browser receives only a 10-minute Realtime client token, never the standard OpenAI key; the user explicitly starts, mutes, and ends microphone access.
 - **Consent at action time:** browser location is requested only when a user chooses to add it to a message.
-- **Bounded input:** intervention requests have a 16 KB body limit and text is capped at 2,000 characters.
+- **Bounded input:** declared intervention bodies larger than 16 KB are rejected; request text is schema-capped at 2,000 characters and context fields have their own limits.
 - **No response caching:** the intervention stream is returned with `Cache-Control: no-store`.
 - **Defensive response handling:** strict schemas, length limits, numeric clamps, resource allow-lists, and widget allow-lists are applied before render.
+- **Allow-listed voice tools:** unknown Realtime tool calls are refused; accepted arguments are validated before the app takes an action.
 - **Security headers:** content-type sniffing, framing, referrer, camera, microphone, and geolocation policies are configured in Next.js.
 - **Automated checks:** CI uses a frozen lockfile, production dependency audit, and full-history Gitleaks scan.
 - **Person-first language:** model instructions prohibit stigmatizing labels, diagnosis, medication or detox instructions, guarantees, shame, and invented helplines.
@@ -226,14 +321,27 @@ The interface is deliberately calm, high-contrast, and action-first:
 - AI, verified, mixed, working, failed, and confirmation-required states are never represented by color alone; and
 - editable messages keep the user in control before any external action.
 
+## Evaluation-criteria evidence
+
+| Judging parameter | Implementation evidence |
+|---|---|
+| **Code quality — high impact** | Typed specialist registry, one orchestrator, provider adapters behind one interface, closed widget/connector vocabularies, shared schemas, small focused modules, and deterministic compilation |
+| **Problem alignment — high impact** | All five challenge pillars map to working evaluator flows: zero typing, personalized scripts, contextual safety, caregiver/education support, and connected multimodal actions |
+| **Security — medium impact** | Server-only long-lived keys, short-lived Realtime credentials, no sensitive database, no response cache, explicit consent, safe connector states, security headers, production dependency audit, and Gitleaks |
+| **Efficiency — medium impact** | One structured generation call for non-emergencies, low reasoning/thinking modes, streamed activity, provider failover without a second orchestration path, static page shell, and zero model latency on Level 1 |
+| **Testing — tie-breaker** | 18 focused unit tests cover request and response schemas, safety routing, emergency independence, deterministic compilation, verified fallback behavior, resource rejection, and connector URL construction |
+| **Accessibility — tie-breaker** | Keyboard focus, semantic controls, 48 px or larger primary targets, live status announcements, reduced-motion support, provider-neutral source labels, and simplified emergency presentation |
+
 ## GenAI and technology stack
 
 | Layer | Technology | Why it is used |
 |---|---|---|
-| Personalized interventions | Model-agnostic provider layer: OpenAI Responses API (`gpt-5.6-terra`, default) or Google Gemini (`gemini-3.6-flash`) via `MODEL_PROVIDER`, with automatic cross-provider fallback | One structured model call per non-emergency intervention, optimized for latency; no single-vendor dependency |
+| Personalized interventions | Model-agnostic provider layer: OpenAI Responses API (`gpt-5.6-terra`) or Google Gemini (`gemini-3.6-flash`) via `MODEL_PROVIDER`, with automatic cross-provider fallback | One structured model call per non-emergency intervention, optimized for latency; no single-vendor dependency |
 | Live conversation | OpenAI Realtime (`gpt-realtime`) over WebRTC | Low-latency speech-to-speech with a short-lived browser credential |
+| Voice-to-screen tools | Five typed Realtime function definitions plus `executeVoiceTool()` | Lets a spoken conversation render help while deterministic code retains control |
 | Safety and orchestration | TypeScript deterministic router and typed specialist registry | Emergency independence, predictable routing, and reviewable policy |
 | Structured output | Strict JSON Schema plus Zod 4 | API-level shape enforcement followed by runtime validation |
+| Multilingual experience | Eight language codes with live generation and BCP-47 speech locales | One shared journey across text, browser speech, live voice, and read-aloud |
 | Application | Next.js 16 App Router and React 19 | UI, server routes, streaming, and standalone deployment |
 | Styling | Tailwind CSS 4 and semantic CSS tokens | Consistent high-contrast, low-cognitive-load presentation |
 | Browser capabilities | Speech Recognition, Speech Synthesis, Web Share, Geolocation, `tel:`, SMS, and WhatsApp links | Multimodal input/output and explicit user-controlled actions |
