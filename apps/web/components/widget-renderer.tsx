@@ -49,7 +49,7 @@ function SourceBadge({ source }: { source: "ai" | "verified" }) {
       }`}
     >
       <Badge className="h-3 w-3" aria-hidden />
-      {verified ? "Verified guidance — not AI" : "AI-generated · gpt-5.6-terra"}
+      {verified ? "Verified guidance — not AI" : "AI-personalized"}
     </span>
   );
 }

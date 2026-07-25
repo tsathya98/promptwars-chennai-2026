@@ -2,13 +2,23 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AudioLines, MicOff, Mic, PhoneOff, RotateCcw } from "lucide-react";
+import { executeVoiceTool, type VoiceToolAction } from "@/lib/voice-tools";
 
 type SessionState = "idle" | "connecting" | "live" | "error";
 
 type Props = {
   mode: "individual" | "caregiver";
   language?: string;
+  /** Deterministic page code performs whatever the voice tool asked for. */
+  onToolAction: (action: VoiceToolAction) => void;
   onClose: () => void;
+};
+
+type RealtimeEvent = {
+  type?: string;
+  delta?: string;
+  transcript?: string;
+  item?: { type?: string; name?: string; call_id?: string; arguments?: string };
 };
 
 /**
@@ -18,13 +28,16 @@ type Props = {
  * Explicit states only — a failed connection says so and falls back to the
  * one-tap buttons, which always work.
  */
-export function LiveVoice({ mode, language = "en", onClose }: Props) {
+export function LiveVoice({ mode, language = "en", onToolAction, onClose }: Props) {
   const [state, setState] = useState<SessionState>("idle");
   const [muted, setMuted] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [toolNote, setToolNote] = useState<string | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const micRef = useRef<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const onToolActionRef = useRef(onToolAction);
+  onToolActionRef.current = onToolAction;
 
   const cleanup = () => {
     micRef.current?.getTracks().forEach((t) => t.stop());
@@ -64,11 +77,7 @@ export function LiveVoice({ mode, language = "en", onClose }: Props) {
       const dc = pc.createDataChannel("oai-events");
       dc.onmessage = (e) => {
         try {
-          const event = JSON.parse(e.data as string) as {
-            type?: string;
-            delta?: string;
-            transcript?: string;
-          };
+          const event = JSON.parse(e.data as string) as RealtimeEvent;
           const type = String(event.type ?? "");
           if (type.includes("output_audio_transcript")) {
             if (type.endsWith(".delta") && typeof event.delta === "string") {
@@ -76,6 +85,39 @@ export function LiveVoice({ mode, language = "en", onClose }: Props) {
             } else if (type.endsWith(".done") && typeof event.transcript === "string") {
               setTranscript(event.transcript.slice(-400));
             }
+          }
+          // Tool calls arrive per output item (pattern verified against the
+          // central-reporting reference implementation).
+          if (
+            type === "response.output_item.done" &&
+            event.item?.type === "function_call" &&
+            event.item.call_id &&
+            event.item.name
+          ) {
+            let args: unknown = {};
+            try {
+              args = event.item.arguments ? JSON.parse(event.item.arguments) : {};
+            } catch {
+              args = {};
+            }
+            // Allow-listed, zod-validated; unknown tools are refused.
+            const result = executeVoiceTool(event.item.name, args);
+            if (result.action) {
+              onToolActionRef.current(result.action);
+              setToolNote(`Put on your screen: ${event.item.name.replaceAll("_", " ")}`);
+            }
+            dc.send(
+              JSON.stringify({
+                type: "conversation.item.create",
+                item: {
+                  type: "function_call_output",
+                  call_id: event.item.call_id,
+                  output: JSON.stringify(result.output),
+                },
+              }),
+            );
+            // Follow-up response so the agent narrates what it rendered.
+            dc.send(JSON.stringify({ type: "response.create" }));
           }
         } catch {
           /* non-JSON events are ignored */
@@ -155,6 +197,11 @@ export function LiveVoice({ mode, language = "en", onClose }: Props) {
           “{transcript}”
         </p>
       )}
+      {toolNote && (
+        <p className="text-xs font-medium text-[var(--teal)]" role="status">
+          ✦ {toolNote}
+        </p>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {state === "idle" && (
@@ -209,8 +256,9 @@ export function LiveVoice({ mode, language = "en", onClose }: Props) {
         )}
       </div>
       <p className="text-xs text-[var(--text-soft)] opacity-75">
-        Speech-to-speech via gpt-realtime. In an emergency, say so — it will point you to 112 and
-        the Emergency button. Audio is processed live, never stored by IBUKI.
+        A live spoken conversation — it can also put helpful tools on your screen while you talk.
+        In an emergency, say so: it points you to 112 and the Emergency button. Audio is processed
+        live, never stored by IBUKI.
       </p>
     </section>
   );

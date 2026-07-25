@@ -129,7 +129,7 @@ flowchart TB
     safetyGuardian --> verifiedProtocol["Reviewed emergency protocol and India 112"]
 
     safetyRouter -->|"Levels 2 and 3"| specialist["Recovery Coach, Caregiver Guide, or Resource Navigator"]
-    specialist --> model["gpt-5.6-terra structured intent"]
+    specialist --> model["Model-agnostic structured intent (OpenAI or Gemini)"]
     model --> schema["Strict JSON Schema and Zod validation"]
     schema --> compiler["Deterministic widget compiler and allow-lists"]
     compiler --> validatedWidgets["Validated widget specifications"]
@@ -170,7 +170,7 @@ Emergency buttons and explicit danger phrases are checked before any model call.
 
 ### The model authors intent, not pixels or actions
 
-For non-emergency support, `gpt-5.6-terra` returns a strict intent object. The Responses API enforces a JSON Schema, Zod validates the parsed object again, and deterministic application code converts approved fields into a closed set of widgets. Unknown resource IDs are rejected.
+For non-emergency support, the platform is **model-agnostic**: a provider layer (`lib/model-provider.ts`) selects the primary model via `MODEL_PROVIDER` (OpenAI default, Gemini option) and automatically falls back to the other verified provider on failure. Whichever model runs, it returns a strict intent object: the provider API enforces a JSON Schema, Zod validates the parsed object again, and deterministic application code converts approved fields into a closed set of widgets. Unknown resource IDs are rejected. Each response records which model actually produced it.
 
 ### Verified fallback instead of fake AI
 
@@ -230,8 +230,8 @@ The interface is deliberately calm, high-contrast, and action-first:
 
 | Layer | Technology | Why it is used |
 |---|---|---|
-| Personalized interventions | OpenAI Responses API with `gpt-5.6-terra`, low reasoning effort | One structured model call per non-emergency intervention, optimized for latency |
-| Live conversation | OpenAI Realtime with `gpt-realtime` over WebRTC | Low-latency speech-to-speech with a short-lived browser credential |
+| Personalized interventions | Model-agnostic provider layer: OpenAI Responses API (`gpt-5.6-terra`, default) or Google Gemini (`gemini-3.6-flash`) via `MODEL_PROVIDER`, with automatic cross-provider fallback | One structured model call per non-emergency intervention, optimized for latency; no single-vendor dependency |
+| Live conversation | OpenAI Realtime (`gpt-realtime`) over WebRTC | Low-latency speech-to-speech with a short-lived browser credential |
 | Safety and orchestration | TypeScript deterministic router and typed specialist registry | Emergency independence, predictable routing, and reviewable policy |
 | Structured output | Strict JSON Schema plus Zod 4 | API-level shape enforcement followed by runtime validation |
 | Application | Next.js 16 App Router and React 19 | UI, server routes, streaming, and standalone deployment |

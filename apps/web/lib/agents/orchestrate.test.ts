@@ -21,6 +21,7 @@ describe("deterministic widget compiler", () => {
       { mode: "individual", buttonId: "urge", language: "en" },
       routed,
       baseIntent,
+      "gpt-5.6-terra",
     );
     const types = response.widgets.map((w) => w.type);
     expect(types).toContain("intervention-script");
@@ -37,6 +38,7 @@ describe("deterministic widget compiler", () => {
       { mode: "individual", buttonId: "urge", language: "en" },
       routed,
       intent,
+      "gpt-5.6-terra",
     );
     const resourceWidgets = response.widgets.filter((w) => w.type === "verified-resource");
     expect(resourceWidgets.map((w) => w.resourceId)).toEqual(["urge-grounding"]);
@@ -49,6 +51,7 @@ describe("deterministic widget compiler", () => {
       { mode: "caregiver", buttonId: "start-conversation", language: "en" },
       routed,
       { ...baseIntent, caregiverGuidance: { sayThis: ["I care about you."], avoidThis: ["Blame."], warningSigns: ["Unresponsive."] } },
+      "gpt-5.6-terra",
     );
     expect(response.widgets.some((w) => w.type === "breathing-guide")).toBe(false);
     expect(response.widgets.some((w) => w.type === "caregiver-guidance")).toBe(true);

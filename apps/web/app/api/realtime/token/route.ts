@@ -1,3 +1,5 @@
+import { VOICE_TOOL_DEFINITIONS } from "@/lib/voice-tools";
+
 export const maxDuration = 30;
 
 /** Verified via live smoke test against the region-pinned host (2026-07-25). */
@@ -32,7 +34,14 @@ Non-negotiable rules:
 - You cannot place calls or send messages. Never claim an action was completed.
 - Helplines you may mention: 112 (emergency), 14446 (national drug de-addiction helpline), 14416 (Tele-MANAS mental health). Never invent others.
 - Ground the person: one small physical step first (move, water, cold, posture), then breathing, then reaching a trusted person.
-- If asked something you have no verified source for, say so and point to a helpline.`;
+- If asked something you have no verified source for, say so and point to a helpline.
+You have SCREEN TOOLS — use them proactively while you talk; they put real, interactive help on the user's screen:
+- show_support_plan: when they describe what's happening and need a plan.
+- show_breathing_guide: whenever you suggest breathing together.
+- prepare_circle_message: when reaching a trusted person would help (you draft it; THEY send it).
+- show_helplines: when confidential phone support fits.
+- show_emergency_help: IMMEDIATELY on any overdose/danger signal, alongside telling them to call 112.
+After a tool call, briefly tell them what appeared on screen. Never claim you sent or completed anything.`;
 }
 
 /**
@@ -66,6 +75,8 @@ export async function POST(req: Request) {
         model: REALTIME_MODEL,
         output_modalities: ["audio"],
         audio: { output: { voice: "marin" } },
+        tools: VOICE_TOOL_DEFINITIONS,
+        tool_choice: "auto",
         instructions: voiceInstructions(mode, language),
       },
     }),

@@ -1,5 +1,5 @@
-import { generateStructured, MODELS } from "../openai";
 import { LANGUAGES } from "../languages";
+import { generateIntent } from "../model-provider";
 import { getResource, isResourceId, resourceCatalogForPrompt } from "../resources";
 import { getButton, route, type RouteResult } from "../safety-router";
 import {
@@ -77,21 +77,19 @@ export async function orchestrate(input: InterveneRequest, emit: Emit): Promise<
     return;
   }
 
-  const generation = beginStage(
-    emit,
-    "generation",
-    `${agent.label} personalizing with ${MODELS.main}`,
-  );
+  const generation = beginStage(emit, "generation", `${agent.label} personalizing your plan`);
   let intent: ModelIntent | null = null;
+  let modelUsed: string | null = null;
   try {
-    intent = await generateStructured({
+    const result = await generateIntent<ModelIntent>({
       schema: modelIntentSchema,
       jsonSchema: MODEL_INTENT_JSON_SCHEMA as unknown as Record<string, unknown>,
       name: "ibuki_intervention_intent",
       system: agent.systemPrompt,
       input: buildUserPrompt(input, routed),
-      effort: "low",
     });
+    intent = result.value;
+    modelUsed = result.model;
     generation.done(`${agent.label} plan generated`);
   } catch (err) {
     generation.fail(
@@ -101,9 +99,10 @@ export async function orchestrate(input: InterveneRequest, emit: Emit): Promise<
   }
 
   const validation = beginStage(emit, "validation", "Validating widgets against the safety policy");
-  const response = intent
-    ? compileResponse(input, routed, intent)
-    : verifiedFallback(input, routed);
+  const response =
+    intent && modelUsed
+      ? compileResponse(input, routed, intent, modelUsed)
+      : verifiedFallback(input, routed);
   validation.done(`${response.widgets.length} widgets approved for ${agent.label}`);
   emit({ type: "response", response });
 }
@@ -142,6 +141,7 @@ export function compileResponse(
   input: InterveneRequest,
   routed: RouteResult,
   intent: ModelIntent,
+  modelUsed: string,
 ): AgentResponse {
   const agent = getAgent(routed.agentId);
   const allow = new Set(agent.allowedWidgets);
@@ -219,7 +219,7 @@ export function compileResponse(
     summary: clampText(intent.summary, 240) || "A short plan for right now.",
     widgets: widgets.slice(0, 5),
     generation,
-    model: MODELS.main,
+    model: modelUsed,
     language: input.language,
   });
 }

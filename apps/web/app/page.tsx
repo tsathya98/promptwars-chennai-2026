@@ -34,8 +34,9 @@ import { AGENTS } from "@/lib/agents/registry";
 import { buildTelLink } from "@/lib/connectors";
 import { LANGUAGE_CODES, LANGUAGES, type LanguageCode } from "@/lib/languages";
 import { COMMAND_BUTTONS, type ActorMode } from "@/lib/safety-router";
-import type { InterveneRequestInput } from "@/lib/schemas";
+import type { InterveneRequestInput, WidgetSpec } from "@/lib/schemas";
 import { useIntervene } from "@/lib/use-intervene";
+import type { VoiceToolAction } from "@/lib/voice-tools";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -62,7 +63,7 @@ const ACCENT: Record<string, string> = {
 };
 
 const GENERATION_LABEL = {
-  ai: "AI-generated · gpt-5.6-terra",
+  ai: "AI-personalized for you",
   "verified-protocol": "Verified guidance — not AI-generated",
   mixed: "AI-personalized · includes verified actions",
 } as const;
@@ -76,8 +77,8 @@ const HOW_IT_WORKS = [
   },
   {
     kicker: "generate",
-    title: "One specialist, one model call",
-    body: "A recovery specialist personalizes your plan with gpt-5.6-terra — schema-validated twice before anything renders.",
+    title: "One specialist, one plan",
+    body: "A recovery specialist personalizes your plan with live AI — checked twice against our safety rules before anything reaches your screen.",
     icon: Sparkles,
   },
   {
@@ -99,6 +100,7 @@ export default function Home() {
   const [draft, setDraft] = useState("");
   const [liveVoiceOpen, setLiveVoiceOpen] = useState(false);
   const [language, setLanguage] = useState<LanguageCode>("en");
+  const [voiceWidgets, setVoiceWidgets] = useState<WidgetSpec[]>([]);
   const { events, response, status, error, intervene, reset } = useIntervene();
   const lastRequest = useRef<InterveneRequestInput | null>(null);
 
@@ -139,6 +141,17 @@ export default function Home() {
   const emergencyNow = () =>
     run({ mode, buttonId: mode === "caregiver" ? "possible-overdose" : "overdose-danger" });
 
+  /** IBUKI Voice screen tools land here — deterministic code does the work. */
+  const handleVoiceTool = (action: VoiceToolAction) => {
+    if (action.kind === "emergency") {
+      emergencyNow();
+    } else if (action.kind === "intervention") {
+      run({ mode, text: action.text });
+    } else {
+      setVoiceWidgets((prev) => [...action.widgets, ...prev].slice(0, 4));
+    }
+  };
+
   return (
     <main className="relative min-h-screen overflow-x-hidden">
       {!crisis && <CursorField />}
@@ -162,7 +175,7 @@ export default function Home() {
             </p>
             <p className="mt-2 flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-soft)] opacity-80">
               <span aria-hidden className="dot-working h-1.5 w-1.5 rounded-full bg-[var(--teal)]" />
-              live · gpt-5.6-terra + gpt-realtime
+              specialists online · private by design
             </p>
           </div>
           {!crisis && (
@@ -355,7 +368,34 @@ export default function Home() {
             </form>
 
             {liveVoiceOpen && (
-              <LiveVoice mode={mode} language={language} onClose={() => setLiveVoiceOpen(false)} />
+              <LiveVoice
+                mode={mode}
+                language={language}
+                onToolAction={handleVoiceTool}
+                onClose={() => setLiveVoiceOpen(false)}
+              />
+            )}
+
+            {voiceWidgets.length > 0 && (
+              <section aria-label="Prepared by IBUKI Voice" className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="kicker">[ Put on screen by IBUKI Voice ]</span>
+                  <button
+                    type="button"
+                    onClick={() => setVoiceWidgets([])}
+                    className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs font-semibold text-[var(--text-soft)] transition-colors hover:border-[var(--line-hi)] hover:text-[var(--text)]"
+                  >
+                    Clear
+                  </button>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {voiceWidgets.map((spec, i) => (
+                    <div key={`voice-${spec.type}-${i}`} className="reveal">
+                      <Widget spec={spec} speechLang={LANGUAGES[language].speech} />
+                    </div>
+                  ))}
+                </div>
+              </section>
             )}
 
             {/* Result canvas + activity rail */}
