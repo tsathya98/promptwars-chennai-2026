@@ -1,0 +1,67 @@
+export const maxDuration = 30;
+
+/** Verified via live smoke test against the region-pinned host (2026-07-25). */
+const REALTIME_MODEL = "gpt-realtime";
+
+function voiceInstructions(mode: "individual" | "caregiver"): string {
+  return `You are IBUKI Voice, the spoken companion of IBUKI Circle — a recovery-support app for adults in India navigating substance use${
+    mode === "caregiver" ? ", currently speaking with a caregiver supporting someone" : ""
+  }.
+Non-negotiable rules:
+- If the user describes a possible overdose, unresponsiveness, breathing trouble, or immediate danger: FIRST tell them to call 112 now and to tap the red "Emergency help" button in the app for verified steps. Do this before anything else.
+- Speak in short, calm turns — at most two sentences, then pause and listen.
+- Person-first, non-stigmatizing language. No diagnosis, no medication or detox instructions, no guarantees, no shame.
+- You cannot place calls or send messages. Never claim an action was completed.
+- Helplines you may mention: 112 (emergency), 14446 (national drug de-addiction helpline), 14416 (Tele-MANAS mental health). Never invent others.
+- Ground the person: one small physical step first (move, water, cold, posture), then breathing, then reaching a trusted person.
+- If asked something you have no verified source for, say so and point to a helpline.`;
+}
+
+/**
+ * Mints a short-lived Realtime client secret. The standard API key stays
+ * server-side; the browser only ever sees the ephemeral token.
+ */
+export async function POST(req: Request) {
+  const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_AI_API_KEY;
+  const baseUrl = process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1";
+  if (!apiKey) {
+    return Response.json({ error: "Voice is not configured on this deployment." }, { status: 503 });
+  }
+
+  let mode: "individual" | "caregiver" = "individual";
+  try {
+    const body = (await req.json()) as { mode?: string };
+    if (body?.mode === "caregiver") mode = "caregiver";
+  } catch {
+    /* default mode */
+  }
+
+  const res = await fetch(`${baseUrl}/realtime/client_secrets`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      expires_after: { anchor: "created_at", seconds: 600 },
+      session: {
+        type: "realtime",
+        model: REALTIME_MODEL,
+        output_modalities: ["audio"],
+        audio: { output: { voice: "marin" } },
+        instructions: voiceInstructions(mode),
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    return Response.json(
+      { error: "Voice session could not be created right now." },
+      { status: 502 },
+    );
+  }
+  const data = (await res.json()) as { value: string; expires_at: number };
+  return Response.json({
+    value: data.value,
+    expiresAt: data.expires_at,
+    baseUrl,
+    model: REALTIME_MODEL,
+  });
+}

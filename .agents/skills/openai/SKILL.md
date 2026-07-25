@@ -44,32 +44,80 @@ const client = new OpenAI({
   baseURL: process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1",
 });
 
-export async function generate(input: string, opts: { reasoningEffort?: "minimal" | "low" | "medium" | "high" } = {}) {
+export async function generate(input: string, opts: { effort?: "low" | "medium" | "high" } = {}) {
   return client.responses.create({
     model: MODELS.main,
-    reasoning: { effort: opts.reasoningEffort ?? "low" },
+    reasoning: { effort: opts.effort ?? "low" },
     input,
   });
 }
 ```
 - Retry-once with 1s backoff on 429/503/500 — same policy as the Gemini ladder.
 - `MOCK=1` returns pre-baked JSON fixtures from `fixtures/`, same convention as
-  `lib/gemini.ts`.
+  `lib/gemini.ts`, but only during local development. Throw immediately if
+  `MOCK=1` and `NODE_ENV=production`; never silently expose fixtures on a deployment.
 - Response text lives at `response.output_text` (or walk `response.output[0].content[0].text`
   for the raw shape) — not `response.choices[0].message.content` (that's the older
   Chat Completions shape, not used here).
 
-## 4. Streaming & Vercel AI SDK
+## 4. Structured output
+
+When a route needs JSON (widget specs, agent responses, any machine-consumed shape),
+NEVER parse markdown-fenced JSON out of free text by hand. Use the Responses API's
+strict JSON-schema mode, then re-validate with zod:
+
+1. **Hand-write a strict JSON schema**: every field listed in `required`,
+   `additionalProperties: false` on every object level. Strict mode rejects schemas
+   that don't meet this bar.
+2. **Pass it via `text.format`**:
+   ```ts
+   const response = await client.responses.create({
+     model: MODELS.main,
+     reasoning: { effort: "low" },
+     input,
+     text: {
+       format: {
+         type: "json_schema",
+         name: "agent_response",
+         strict: true,
+         schema, // the hand-written strict schema
+       },
+     },
+   });
+   const raw = JSON.parse(response.output_text);
+   ```
+3. **Re-validate with zod before use**: `const parsed = AgentResponseSchema.parse(raw);`
+   The API guarantees shape, but zod is the trust boundary — it enforces our
+   semantic rules (allow-listed IDs, enum values, string lengths) and gives typed
+   output. Model output is never used un-validated.
+4. **Handle non-answer states explicitly**: an incomplete response, refusal, empty
+   `output_text`, JSON parse failure, or zod failure must become an honest typed
+   error/degraded state. Never coerce it into a plausible success object.
+5. **Keep authority in deterministic code**: structured output may recommend an
+   allow-listed widget or connector intent, but it must not execute side effects or
+   lower a safety classification already raised by deterministic logic.
+
+## 5. Streaming & Vercel AI SDK
 
 If interactive `useChat`-style streaming is needed on this provider, add
 `@ai-sdk/openai` and use `streamText({ model: openai("gpt-5.6-terra"), ... })` —
 same pattern as the Gemini `ai` + `@ai-sdk/google` route, just a different provider
 package. Don't hand-roll SSE parsing against the raw Responses API.
 
-## 5. Smoke Testing
+## 6. Smoke Testing
 
 Before wiring a route to this provider, verify the key + model + baseURL combo
 with a one-line ping (mirrors the `gemini` skill's `/api/health` check):
 ```ts
 await client.responses.create({ model: "gpt-5.6-terra", reasoning: { effort: "low" }, input: "ping" });
 ```
+
+## 7. Model verification rule
+
+Only `gpt-5.6-terra` is verified on this project's region-pinned key. Any OTHER
+model ID — realtime, moderation, embeddings, audio, anything — must pass a live
+smoke test against the region-pinned host (`https://us.api.openai.com/v1`) BEFORE
+being written into application code. Region-pinned keys frequently lack access to
+models the docs advertise. If the smoke test fails, descope the feature silently —
+do not ship code that references an unverified model ID, and do not fall back to
+faking the feature's output.

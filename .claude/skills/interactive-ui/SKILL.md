@@ -5,6 +5,8 @@ description: State-of-the-art cursor-reactive and motion-rich frontend — parti
 
 # Interactive UI — cursor-reactive, state-of-the-art frontend
 
+**Precedence rule — function over flash: any effect that delays, obscures, or risks a functional flow gets cut.** Judged functionality always outranks visual wow; when an effect and a flow conflict, the effect loses, immediately and without debate.
+
 Reference pedigree: agentic-central-reporting's login (`MoleculeCanvas.tsx` — cursor-reactive particle field, `CursorReadout.tsx` — instrumentation-style coords readout). The goal is UI that *responds to the user's presence* — judges remember interfaces that feel alive.
 
 ## Cursor-reactivity is an app-wide design language
@@ -64,6 +66,22 @@ Primary CTA leans toward the cursor: translate by `(cursor - center) * 0.25`, cl
 
 ### 5. Instrumentation details (cheap "crafted" signals)
 Cursor coords readout in the footer (normalized 0–1, mono font, tabular nums), live clock, session tick counter, tiny status dot pulsing with `/api/health`. One or two of these make the app feel like a precision instrument.
+
+## Designing for distressed users
+
+When the app serves users under acute stress (crisis, health, recovery, safety contexts), these rules override the showpiece aesthetics above:
+
+- **Dark muted palette**: for this product, use a dark, low-saturation color system so urgent content remains visually calm. Reserve high-saturation color for small accents such as focus rings and thin highlights, never large fills.
+- **Crisis/emergency states collapse around ONE dominant action** with ALL decorative
+  effects disabled — particles, gradient orbs, magnetic hovers, spotlight layers all
+  off. Keep secondary verified instructions concise and progressively disclosed so
+  they support, rather than compete with, the primary action.
+- **No shame mechanics**: no streak resets, no confetti, no buttons that carry moral weight ("I failed", "I gave in"). Celebration and punishment patterns both backfire under distress.
+- **A pausable breathing pacer is the ONLY sanctioned distress-state animation.** Every other motion in a distress flow is noise at best and a stressor at worst.
+- **Voice controls are always paired with visible button fallbacks** — speech fails exactly when stress peaks.
+- **Touch targets ≥48px** throughout; primary crisis actions larger.
+- **Never rely on color, motion, or iconography alone** for urgency. Pair every
+  state with short, literal text and preserve visible keyboard focus.
 
 ## Performance & correctness rules (non-negotiable)
 

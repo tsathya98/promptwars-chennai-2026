@@ -2,7 +2,7 @@
 
 # IBUKI Circle — Recovery & Prevention Platform
 
-### Real-time GenAI emergency de-escalation, zero-typing interventions & caregiver support under high cognitive load.
+### Zero-typing recovery interventions, deterministic emergency guidance, and caregiver support under high cognitive load.
 
 [![Live Demo](https://img.shields.io/badge/▲_Live_Demo-visit_app-000000?style=for-the-badge)](https://web-delta-three-92.vercel.app)
 [![Built at PromptWars](https://img.shields.io/badge/PromptWars_Chennai-Google_for_Developers-EA4335?style=for-the-badge)](https://hack2skill.com)
@@ -20,28 +20,32 @@ Individuals navigating substance use disorders and their families face overwhelm
 
 ## What IBUKI Circle does
 
-- 🔴 **Zero-Typing Emergency Interventions**: 1-tap instant action triggers for craving peaks, panic, and impulse risk without requiring user typing.
-- ⚡ **Real-Time De-Escalation Protocols**: Generates 3-step physical and sensory grounding directives tailored to the user's distress state.
-- 🗣️ **Emergency Voice Scripts**: Built-in Web Speech API audio synthesis reads crisis scripts aloud to de-escalate stress hands-free.
-- 🤝 **Caregiver & Family Support Hub**: Non-confrontational communication scripts, safety check protocols, and family emergency tools.
+- **Zero-typing intervention:** one-tap commands and feature-detected voice input route through the same safety pipeline.
+- **Deterministic emergency path:** suspected overdose or immediate danger renders verified 112 guidance without waiting for a model.
+- **Structured recovery support:** `gpt-5.6-terra` produces validated intent that deterministic code compiles into recovery widgets.
+- **Caregiver mode:** supportive language, warning signs, escalation guidance, and India-first resources.
+- **Honest actions:** phone, message, share, read-aloud, and consent-based location actions never claim delivery.
+- **Visible activity:** the interface displays real routing, generation, and validation stages without exposing chain-of-thought.
 
 ## See it in 90 seconds
 
-1. **Click 1-Tap Trigger**: Tap *"Intense Craving Peak"* or *"Panic / Anxiety"* on the home dashboard.
-2. **Instant De-Escalation**: View the 1-sentence grounding directive, 3-step protocol, and immediate action item.
-3. **Listen Aloud / Speak Script**: Click *"🔊 Read Script Aloud"* to play the speech-synthesized voice script hands-free.
-4. **Caregiver Mode**: Switch to Caregiver Hub for non-confrontational scripts and family safety check-ins.
+1. Tap **I'm having a strong urge** to generate a validated recovery plan.
+2. Use **Read aloud** or open the editable circle message in a phone or messaging app.
+3. Switch to **I'm supporting someone** for caregiver-specific language and warning signs.
+4. Tap **Possible overdose** to show verified emergency actions immediately, with no model dependency.
 
 ## How it works
 
 ```mermaid
 flowchart LR
-    U([User / Caregiver]) --> UI[Next.js 15 UI<br/>Cursor-reactive & Glassmorphic]
-    UI --> API["/api/emergency & /api/chat"]
-    API --> LLM["gpt-5.6-terra<br/>(Low Latency Reasoning)"]
-    LLM --> SCRIPT[Real-Time De-Escalation & Emergency Scripts]
-    SCRIPT --> TTS[Web Speech Audio Reader]
-    TTS --> UI
+    input["Tap, voice, or text"] --> api["POST /api/intervene"]
+    api --> router["Deterministic safety router"]
+    router -->|Emergency| verified["Verified India safety protocol"]
+    router -->|Support| model["gpt-5.6-terra structured output"]
+    model --> validation["JSON Schema, Zod, and allow-lists"]
+    validation --> widgets["Closed-vocabulary widgets"]
+    verified --> widgets
+    widgets --> actions["User-confirmed connectors"]
 ```
 
 ## AI Stack & Infrastructure
@@ -50,22 +54,34 @@ flowchart LR
 |---|---|
 | **`gpt-5.6-terra`** | Low-latency real-time emergency script generation and crisis de-escalation |
 | **OpenAI API** | Scalable API key integration with `low` reasoning effort configuration |
-| **Next.js 15 App Router** | High-performance React 19 web application framework |
-| **Tailwind CSS 4** | Glassmorphic, dark-mode accessible design system |
-| **Web Speech API** | Hands-free audio reading of generated emergency scripts |
+| **Next.js 16 App Router** | React 19 application, API routes, and NDJSON intervention streaming |
+| **Zod + strict JSON Schema** | Validates every machine-consumed model response before rendering |
+| **Tailwind CSS 4** | Low-cognitive-load, dark semantic design system |
+| **Web Speech APIs** | Feature-detected voice input and hands-free script playback |
+| **Vitest + Nx** | Focused safety/schema tests and repeatable build checks |
 
 ## Run it locally
 
 ```bash
 pnpm install
-pnpm dev                     # → http://localhost:3000
-curl localhost:3000/api/health   # verify health endpoint
+pnpm nx dev web                 # → http://localhost:3000
+pnpm nx test web
+pnpm nx lint web
+pnpm nx build web
+curl localhost:3000/api/health  # verify the active model
 ```
 
 | Variable | Purpose |
 |---|---|
 | `OPENAI_API_KEY` | OpenAI API key for `gpt-5.6-terra` calls |
-| `OPENAI_BASE_URL` | Region-pinned host (`https://us.api.openai.com/v1`) — required, the default host 404s |
+| `OPENAI_BASE_URL` | Optional override; defaults to the required region-pinned `https://us.api.openai.com/v1` host |
+
+## Safety and privacy
+
+- Emergency guidance is reviewed, source-labelled, and independent of the model.
+- AI-authored and verified content are visibly distinguished.
+- The app does not persist transcripts, location, crisis history, phone numbers, or health information.
+- Calls, messages, sharing, and location remain explicit user-confirmed actions.
 
 ---
 

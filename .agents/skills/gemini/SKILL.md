@@ -7,7 +7,10 @@ description: Gemini API integration patterns for PromptWars Chennai 2026 — mod
 
 > **Provider note**: the event's original "Google models only" rule has been lifted —
 > any vendor is now allowed. This skill still applies whenever Gemini is the model
-> in use for a given call; see the `openai` skill for the other supported lane.
+> in use for a given call; see the `openai` skill for the active IBUKI submission.
+> The current app does not contain a Gemini wrapper or route, so do not assume the
+> historical scaffold paths below exist. Introduce this lane only after a live model
+> smoke test and an explicit provider decision.
 
 ## 1. Verified Model Lineup (July 2026)
 
@@ -18,13 +21,14 @@ description: Gemini API integration patterns for PromptWars Chennai 2026 — mod
 
 ## 2. Dual Provider Routing Strategy
 
-| Physical Path | Auth Mechanism | Best For | Code Reference |
+| Physical Path | Auth Mechanism | Best For | Required implementation |
 |---|---|---|---|
-| **Antigravity Subscription** | Google OAuth (`agy -p`) | Local non-interactive generation, fixtures, seed data | `lib/antigravity.ts`, `scripts/agy-batch.mjs` |
-| **Unified Facade** | Subscription → API Key fallback | Local report compilation & heavy generation | `lib/llm.ts` (`generateText`) |
-| **Gemini API Key** | `GEMINI_API_KEY` / `GOOGLE_GENERATIVE_AI_API_KEY` | Deployed Vercel routes, streaming chat (`useChat`), web client calls | `lib/gemini.ts`, `app/api/chat/route.ts` |
+| **Antigravity Subscription** | Google OAuth (`agy -p`) | Optional local non-interactive generation | Add a dedicated local-only adapter |
+| **Unified Facade** | Subscription → API Key fallback | Optional mixed-provider routing | Add one server-only provider facade |
+| **Gemini API Key** | `GEMINI_API_KEY` / `GOOGLE_GENERATIVE_AI_API_KEY` | Deployed routes and interactive calls | Add one centralized server-only Gemini wrapper |
 
-- **Routing Rule**: Streaming chat and deployed paths MUST use the API key path (`LLM_PROVIDER=api` on Vercel). Local background/batch generation MUST leverage the Antigravity subscription to conserve API key token quotas.
+- **Routing Rule**: If Gemini is selected, deployed paths must use an API key
+  available to the server runtime. Keep subscription-only tooling local.
 
 ## 3. Core Implementation Patterns
 
@@ -53,11 +57,12 @@ const { object } = await generateObject({
 });
 ```
 
-### B. Single Wrapper & Fallback Ladder (`lib/gemini.ts`)
-All direct model calls MUST flow through `lib/gemini.ts` to guarantee resilience:
+### B. Single Wrapper & Fallback Ladder
+If Gemini is selected, route all direct model calls through one server-only wrapper:
 - Retry once with 1s exponential backoff on 429/503.
 - Model Fallback Ladder: `gemini-3.6-flash` → `gemini-3.5-flash-lite` → `GEMINI_API_KEY_FALLBACK`.
-- Zero-token dev mode: `MOCK=1` returning pre-baked JSON fixtures from `fixtures/`.
+- Optional fixture mode may be used locally, but must throw or remain unreachable
+  in production.
 
 ### C. Search Grounding & Multimodal (Raw `@google/genai`)
 Drop to `@google/genai` when leveraging native Google Search grounding or Live API:
@@ -87,4 +92,6 @@ const res = await ai.models.generateContent({
 - **Tool Output Budgeting**: Enforce per-call character limits (~4k chars) on tool outputs with truncation markers.
 
 ## 5. Smoke Testing
-- Every deployment must maintain `GET /api/health` calling `gemini-3.5-flash-lite` with a `"ping"` payload to verify live quota and credentials.
+- When Gemini powers the deployed app, maintain `GET /api/health` with a small
+  live call to the selected verified model so the route checks real quota and
+  credentials.

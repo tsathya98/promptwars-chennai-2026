@@ -7,6 +7,8 @@ description: Demo-first rapid prototyping under a hard deadline — narrow scope
 
 You are building a time-boxed demo evaluated on a **90-second live pitch**. Every engineering decision must optimize for speed, visibility, and execution.
 
+**Law #0 — Functionality IS the demo**: a feature exists only when it runs end-to-end on the deployed URL against real model calls. Judges disqualify static pages, mock data presented as real, hallucinated AI responses, and false positives. If a feature can't work by freeze, hide its entry point instead of faking it.
+
 **The core law: cut scope, never quality.** Fewer features, each one finished, eye-catching, and documented — a demo with 2 polished features beats one with 5 half-baked ones. "Rapid" means ruthless prioritization, NOT half-baked output.
 
 ## 1. Prime Directives
@@ -16,9 +18,10 @@ You are building a time-boxed demo evaluated on a **90-second live pitch**. Ever
    - Re-deploy after every feature addition. Never allow local development state to diverge >30 minutes from the live deployment.
 2. **Demo-First Execution**:
    - Prioritize what judges *see* and *experience* over hidden architectural perfection.
-   - Hardcoded demo paths, seeded one-click chips, and canned fallback fixtures are essential demo features, not hacky workarounds.
+   - Seeded one-click chips and deterministic demo paths are welcome. Fixtures are
+     for local UI development only; production must never present them as live AI.
 3. **Walking Skeleton First**:
-   - Complete the end-to-end slice (`UI` → `/api/chat` → `Gemini 3.6 Flash` → `WidgetRenderer`) before spending time on secondary features.
+   - Complete the end-to-end slice (`UI` → active API route → server-only provider wrapper → `WidgetRenderer`) before spending time on secondary features.
 4. **End Every Increment with a Demo Line**:
    - After completing any task, state in exactly one sentence what capability can now be demonstrated on stage.
 
@@ -28,7 +31,8 @@ A feature is NOT done until ALL of these hold. If time runs short, drop the next
 
 - **Functional**: the full happy path works on the DEPLOYED URL, not just localhost.
 - **Eye-catching**: intentional visual design — smooth loading skeletons, micro-transitions (hover/enter states), meaningful empty states, consistent semantic design tokens, dark-mode correct, and cursor-reactive surfaces per the `interactive-ui` skill (spotlight cards app-wide, one ambient moment). It should look like a product screenshot, never a bootstrap tutorial.
-- **Resilient**: friendly styled error states; fallback fixture path for the seeded demo inputs.
+- **Resilient**: friendly styled error states, retry paths, and clearly labelled
+  deterministic guidance where the domain provides it. Fixture paths stay local-only.
 - **Documented**: covered in the README (see §5) and, if user-facing, in the demo script.
 
 ## 3. Strict Scope Control
@@ -42,6 +46,9 @@ A feature is NOT done until ALL of these hold. If time runs short, drop the next
   - Friendly error boundaries (no raw JSON/red overlays).
   - One-click "Try Example" chips pre-loaded with optimal demo queries.
   - Dark mode design system using Tailwind 4 semantic CSS variables.
+- **PRODUCTION TRIPWIRE**: fail closed if `MOCK=1` is detected with
+  `NODE_ENV=production`. A deployment must not be able to expose fixture output by
+  configuration accident.
 
 ## 4. Web Verification & Fact-Checking
 
@@ -64,13 +71,20 @@ Judges and mentors WILL open the repo. Maintain from the first hour (not retrofi
 
 ## 6. Code & Architecture Discipline
 
-- **Nx monorepo (pre-scaffolded)**: `apps/web` = Next.js 15 App Router + React 19 + TypeScript + Tailwind CSS 4 (+ shadcn/ui); `apps/backend` = optional uv-managed FastAPI sidecar. Run everything through `pnpm nx ...` (`dev web`, `build web`, `serve backend`). Do NOT create new apps/libs mid-hackathon unless the problem truly demands it.
-- **Centralized Wrapper**: ALL Gemini API calls must route through `lib/gemini.ts` (or `lib/llm.ts`).
-- **Zero-Token UI Iteration**: Toggle `MOCK=1` in `.env.local` to iterate on UI components using cached JSON fixtures without spending Gemini API quota.
+- **Nx monorepo (pre-scaffolded)**: `apps/web` = Next.js 16 App Router + React 19 + TypeScript + Tailwind CSS 4 (+ shadcn/ui); `apps/backend` = optional uv-managed FastAPI sidecar. Run everything through `pnpm nx ...` (`dev web`, `test web`, `lint web`, `build web`, `serve backend`). Do NOT create new apps/libs mid-hackathon unless the problem truly demands it.
+- **Centralized Wrapper**: Route active provider calls through the corresponding
+  server-only wrapper. The current submission uses `lib/openai.ts`; if the provider
+  changes, create one equivalent wrapper rather than scattering SDK calls.
+- **Zero-Token UI Iteration**: Use fixture mode only when the active wrapper
+  explicitly implements it. Fixture mode is local-development-only and must never
+  be reachable on a deployment — mock output presented as live AI is a
+  disqualification hazard (see Law #0).
 - **Frequent Git Commits**: Commit after every working slice (`git commit -am "wip: <feature>"`).
 
 ## 7. Failure Mitigation
 
-- If a feature takes longer than 30 minutes to resolve or debug, simplify its *scope* (fewer inputs, seeded data) while keeping its polish bar — or replace it with a pre-seeded fixture.
+- If a feature takes longer than 30 minutes to resolve or debug, simplify its
+  *scope* (fewer inputs, seeded data) while keeping its polish bar. If it still
+  cannot work live, hide it; do not replace production AI behavior with a fixture.
 - If a component remains broken near freeze time, hide the UI entry point. A hidden feature is neutral; a broken feature during a live pitch loses points.
 - Never present an unstyled, error-prone, or undocumented feature as "done" — downgrade scope until what remains meets the Definition of Done.

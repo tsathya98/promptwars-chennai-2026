@@ -1,16 +1,21 @@
 ---
 name: demo-polish
-description: Final-hour demo hardening, feature freeze, error-proofing, seeded input setup, pitch script creation, and QR code generation for PromptWars Chennai 2026. Trigger when the user says "freeze", "polish", "pitch prep", or when <90 minutes remain.
+description: Final-hour demo hardening, feature freeze, error-proofing, seeded input setup, pitch script creation, and QR code generation for PromptWars Chennai 2026. Trigger when the user says "freeze", "polish", "pitch prep", or when 90 minutes or less remain.
 ---
 
 # Final-Hour Demo Polish & Feature Freeze
 
-When feature freeze is called (or at 4:00 PM), immediately halt new feature development and execute the following 4-step hardening protocol in sequence.
+When feature freeze is called or the configured submission deadline is approaching, immediately halt new feature development and execute the following 4-step hardening protocol in sequence.
 
 ## Step 1: Error-Proof All Visible User Paths
 
 1. **Graceful Error Boundaries**: Wrap every Gemini call and API route in a try-catch block that renders a styled, friendly UI message on failure (never show unhandled stack traces, raw error JSON, or red Next.js dev overlays).
-2. **Fallback Ladder Verification**: Test whichever fallback ladder the app actually uses locally by temporarily invalidating the primary key — e.g. `gemini-3.6-flash` → `gemini-3.5-flash-lite` → `GEMINI_API_KEY_FALLBACK` on the Gemini lane, or the equivalent retry-once-with-backoff in `lib/openai.ts` on the OpenAI lane.
+2. **Fallback Ladder Verification**: Test whichever fallback ladder the app actually
+   uses with a controlled local or preview-deployment failure — e.g.
+   `gemini-3.6-flash` → `gemini-3.5-flash-lite` →
+   `GEMINI_API_KEY_FALLBACK` on the Gemini lane, or the equivalent retry-once
+   behavior in `lib/openai.ts` on the OpenAI lane. Never invalidate or rotate the
+   production key immediately before the pitch.
 3. **Empty State Guards**: Ensure every table, chart, list, and card component handles empty or null data gracefully without crashing or breaking layout.
 4. **Console Hygiene**: Clear out all dev console errors, warnings, and unhandled rejections on the **deployed Vercel URL** (test on actual deployment, not localhost).
 
@@ -18,7 +23,22 @@ When feature freeze is called (or at 4:00 PM), immediately halt new feature deve
 
 1. **One-Click Demo Chips**: Implement pre-populated input chips for the exact queries to be demonstrated on stage. The presenter should never have to manually type during a live pitch.
 2. **Warmup Trigger**: Fire a lightweight warmup request (`/api/health`) on page load to initialize model connections and avoid cold-start delays during the pitch.
-3. **Canned Fixture Backup**: If a live call encounters a rate limit (429) during the pitch, configure the UI to silently fall back to pre-cached fixtures (`fixtures/`) for seeded demo inputs.
+3. **Honest Degraded State (never fixtures-as-AI)**: If a live call encounters a rate limit (429) or any model failure during the pitch, the UI must show an honest degraded state: a styled error message, a one-tap retry, and — where a verified deterministic protocol exists — that content clearly labelled as verified (non-AI) guidance. NEVER present canned/fixture output as model output: mock or hallucinated AI responses are instant disqualification per docs/00.
+
+## Step 2.5: DQ Audit (run before freeze)
+
+Disqualification rules (docs/00) are zero-tolerance — audit for them explicitly before tagging the freeze:
+
+1. **Grep the app** for DQ hazards and remove every hit that is reachable in production:
+   - `alert(` — fake success/confirmation dialogs.
+   - Hardcoded response objects in `catch` blocks that are presented as AI output.
+   - `MOCK` usage reachable in a deployed environment (MOCK is local-dev-only).
+2. **Evaluator walkthrough on the DEPLOYED URL**: walk through every normal judged
+   flow exactly as an evaluator would, then run a **permission-denied pass** (deny
+   mic/location/notification permissions and confirm the flow still completes via
+   button fallbacks). Run the **AI-failure pass** on a controlled preview deployment
+   or local failure-injection path; confirm the honest degraded state without
+   weakening the production deployment.
 
 ## Step 3: Pitch Collateral & QR Code
 

@@ -4,14 +4,20 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
+  "pnpm": {
+    "overrides": {
+      "sharp": ">=0.35.0",
+      "postcss": ">=8.5.18"
+    }
+  },
   "dependencies": {
-    "next": "~16.1.6",
+    "next": "~16.2.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
-    "@next/eslint-plugin-next": "^16.1.6",
+    "@next/eslint-plugin-next": "^16.2.11",
     "@nx/eslint": "23.1.0",
     "@nx/eslint-plugin": "23.1.0",
     "@nx/js": "23.1.0",

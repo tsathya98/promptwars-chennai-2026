@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import type { ComponentType, SVGProps } from "react";
 import {
+  AudioLines,
   Flame,
   HeartHandshake,
   HeartPulse,
@@ -19,6 +20,7 @@ import {
 } from "lucide-react";
 import { ActivityRail } from "@/components/activity-rail";
 import { CursorField } from "@/components/cursor-field";
+import { LiveVoice } from "@/components/live-voice";
 import { VoiceControl } from "@/components/voice-control";
 import { Widget, WidgetCanvas } from "@/components/widget-renderer";
 import { AGENTS } from "@/lib/agents/registry";
@@ -60,6 +62,7 @@ const GENERATION_LABEL = {
 export default function Home() {
   const [mode, setMode] = useState<ActorMode>("individual");
   const [draft, setDraft] = useState("");
+  const [liveVoiceOpen, setLiveVoiceOpen] = useState(false);
   const { events, response, status, error, intervene, reset } = useIntervene();
   const lastRequest = useRef<InterveneRequest | null>(null);
 
@@ -218,6 +221,20 @@ export default function Home() {
               className="flex items-center gap-2"
             >
               <VoiceControl disabled={working} onTranscript={submitText} />
+              <button
+                type="button"
+                onClick={() => setLiveVoiceOpen((v) => !v)}
+                aria-pressed={liveVoiceOpen}
+                aria-label="Open live voice conversation"
+                className={`flex min-h-12 items-center gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors ${
+                  liveVoiceOpen
+                    ? "border-[var(--indigo)] bg-[var(--indigo)]/15 text-[var(--indigo)]"
+                    : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)] hover:text-[var(--text)]"
+                }`}
+              >
+                <AudioLines className="h-4 w-4" aria-hidden />
+                <span className="hidden sm:inline">Live voice</span>
+              </button>
               <label htmlFor="free-text" className="sr-only">
                 Describe what is happening, or use the buttons above
               </label>
@@ -239,6 +256,8 @@ export default function Home() {
                 <Send className="h-4 w-4" aria-hidden />
               </button>
             </form>
+
+            {liveVoiceOpen && <LiveVoice mode={mode} onClose={() => setLiveVoiceOpen(false)} />}
 
             {/* Result canvas + activity rail */}
             {(working || response || error) && (
