@@ -1,60 +1,86 @@
 import OpenAI from "openai";
+import type { ZodType } from "zod";
 
+/** Only model verified against this project's region-pinned key. */
 export const MODELS = {
   main: "gpt-5.6-terra",
 } as const;
 
-const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_AI_API_KEY;
+let cachedClient: OpenAI | null = null;
 
-const client = new OpenAI({
-  apiKey: apiKey,
-  baseURL: process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1",
-});
+/** Lazy so importing this module never requires credentials (tests, builds). */
+function getClient(): OpenAI {
+  cachedClient ??= new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || process.env.OPEN_AI_API_KEY,
+    // The project key is region-pinned; the default api.openai.com host
+    // rejects it with `incorrect_hostname`.
+    baseURL: process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1",
+  });
+  return cachedClient;
+}
 
+const RETRYABLE_STATUS = new Set([429, 500, 503]);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export async function generate(
-  input: string,
-  opts: {
-    system?: string;
-    model?: string;
-    reasoningEffort?: "minimal" | "low" | "medium" | "high";
-  } = {},
-) {
-  if (process.env.MOCK === "1") return mockResponse(input);
-  const {
-    model = MODELS.main,
-    system = "You are an empathetic, real-time crisis intervention and de-escalation AI supporting individuals navigating substance use disorders and their caregivers.",
-    reasoningEffort = "low",
-  } = opts;
-
+async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
   let lastErr: unknown;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const response = await client.chat.completions.create({
-        model,
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: input },
-        ],
-        reasoning_effort: (reasoningEffort === "minimal" ? "low" : reasoningEffort) as "low" | "medium" | "high",
-      });
-      return {
-        output_text: response.choices[0]?.message?.content || "",
-        usage: response.usage,
-      };
+      return await fn();
     } catch (err: unknown) {
       lastErr = err;
       const status = (err as { status?: number }).status;
-      if (status !== 429 && status !== 503 && status !== 500) throw err;
+      if (!status || !RETRYABLE_STATUS.has(status)) throw err;
       await sleep(1000 * (attempt + 1));
     }
   }
   throw lastErr;
 }
 
-async function mockResponse(input: string) {
-  return {
-    output_text: `[RECOVERY AI RESPONSE] De-escalation plan generated for: ${input.slice(0, 80)}`,
-  };
+export type ReasoningEffort = "low" | "medium" | "high";
+
+/** Plain-text generation via the Responses API (low effort = low latency). */
+export async function generate(
+  input: string,
+  opts: { system?: string; model?: string; effort?: ReasoningEffort } = {},
+) {
+  const { model = MODELS.main, system, effort = "low" } = opts;
+  const response = await withRetry(() =>
+    getClient().responses.create({
+      model,
+      reasoning: { effort },
+      ...(system ? { instructions: system } : {}),
+      input,
+    }),
+  );
+  return { output_text: response.output_text ?? "", usage: response.usage };
+}
+
+/**
+ * Structured generation: a strict JSON schema is enforced at the API layer and
+ * the parsed output is re-validated with zod before anything renders. No
+ * markdown-fence stripping, no parse-and-pray.
+ */
+export async function generateStructured<T>(args: {
+  schema: ZodType<T>;
+  jsonSchema: Record<string, unknown>;
+  name: string;
+  input: string;
+  system: string;
+  model?: string;
+  effort?: ReasoningEffort;
+}): Promise<T> {
+  const { schema, jsonSchema, name, input, system, model = MODELS.main, effort = "low" } = args;
+  const response = await withRetry(() =>
+    getClient().responses.create({
+      model,
+      reasoning: { effort },
+      instructions: system,
+      input,
+      text: {
+        format: { type: "json_schema", name, strict: true, schema: jsonSchema },
+      },
+    }),
+  );
+  return schema.parse(JSON.parse(response.output_text ?? ""));
 }

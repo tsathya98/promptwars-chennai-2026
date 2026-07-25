@@ -1,3 +1,170 @@
 @import "tailwindcss";
 
-:root { --accent: #6366f1; }
+/*
+ * IBUKI Circle design tokens — evidence-backed calm-dark system.
+ * Distressed users prefer dark, muted palettes; bright saturated color reads
+ * as jarring. Teal = routine recovery actions, indigo = human connection,
+ * amber = small attention accents + focus ring ONLY, crimson = Level-1
+ * emergency ONLY. (Sources cited in docs/07-ibuki-circle-plan.md §5.)
+ */
+:root {
+  /* Warm ink + bone + mint system (adapted from the central-reporting design
+     language) — deliberately NOT the default AI-app navy/indigo look. */
+  --bg: #141416;
+  --surface: #1b1b1f;
+  --surface-hi: #232329;
+  --line: rgba(244, 239, 230, 0.1);
+  --line-hi: rgba(244, 239, 230, 0.22);
+  --text: #f4efe6;
+  --text-soft: #b9b2a4;
+  --teal: #7af3d0; /* mint — routine support & primary recovery actions */
+  --indigo: #c4b5fd; /* soft violet — human connection & caregiver actions */
+  --amber: #f5c84c; /* small attention accents + focus ring ONLY */
+  --crisis: #e5484d; /* Level-1 emergency ONLY */
+  --crisis-soft: #ffb3ab;
+  /* SpotlightCard + generic accent consumers read this token. */
+  --accent: #7af3d0;
+}
+
+.hero-serif {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Keyboard focus must survive high cognitive load. */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.kicker {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.surface {
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+/* ---------- Cursor spotlight (contract required by spotlight-card.tsx) ---------- */
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  background: radial-gradient(
+    var(--r) circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklch, var(--accent, #5eead4) 10%, transparent),
+    transparent 70%
+  );
+}
+.spotlight:hover::before {
+  opacity: 1;
+}
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  border: 1px solid transparent;
+  background: radial-gradient(
+      calc(var(--r) * 0.75) circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklch, var(--accent, #5eead4) 45%, transparent),
+      transparent 70%
+    )
+    border-box;
+  mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+.spotlight:hover::after {
+  opacity: 1;
+}
+
+/* ---------- Motion (calm, 150-400ms, disabled for reduced motion) ---------- */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reveal {
+  animation: rise-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes shimmer-sweep {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(100deg, var(--surface) 40%, var(--surface-hi) 50%, var(--surface) 60%);
+  background-size: 200% 100%;
+  animation: shimmer-sweep 2.2s linear infinite;
+  border-radius: 16px;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+.dot-working {
+  animation: pulse-dot 1.4s ease-in-out infinite;
+}
+
+/* Breathing pacer — the only sanctioned distress-state animation; pausable. */
+.breath-circle {
+  transition: transform var(--breath-dur, 4s) ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .shimmer,
+  .dot-working {
+    animation: none !important;
+  }
+  .breath-circle,
+  .spotlight::before,
+  .spotlight::after {
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .spotlight::before,
+  .spotlight::after {
+    display: none;
+  }
+}

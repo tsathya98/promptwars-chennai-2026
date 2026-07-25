@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "web",
+  "projectType": "application",
+  "sourceRoot": "apps/web",
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default"
+      ],
+      "outputs": [],
+      "options": {
+        "cwd": "apps/web",
+        "command": "vitest run"
+      }
+    }
+  }
+}
