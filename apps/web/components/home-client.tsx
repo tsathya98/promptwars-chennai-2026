@@ -28,6 +28,7 @@ import { buildTelLink } from "@/lib/connectors";
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
 import type { ActorMode } from "@/lib/safety-router";
 import type { InterveneRequestInput, WidgetSpec } from "@/lib/schemas";
+import { t } from "@/lib/ui-strings";
 import { useIntervene } from "@/lib/use-intervene";
 import type { VoiceToolAction } from "@/lib/voice-tools";
 
@@ -117,6 +118,7 @@ export default function HomeClient() {
             <CommandDock
               mode={mode}
               working={working}
+              language={language}
               onModeChange={setMode}
               onCommand={(buttonId) => run({ mode, buttonId })}
             />
@@ -124,6 +126,7 @@ export default function HomeClient() {
             <ContextChips
               alone={alone}
               setting={setting}
+              language={language}
               onAloneChange={setAlone}
               onSettingChange={setSetting}
             />
@@ -139,6 +142,7 @@ export default function HomeClient() {
               <VoiceControl
                 disabled={working}
                 lang={LANGUAGES[language].speech}
+                uiLanguage={language}
                 onTranscript={submitText}
               />
               <button
@@ -153,7 +157,9 @@ export default function HomeClient() {
                 }`}
               >
                 <AudioLines className="h-4 w-4" aria-hidden />
-                <span className="hidden sm:inline">Live voice</span>
+                <span className="hidden sm:inline" lang={language}>
+                  {t(language, "liveVoice")}
+                </span>
               </button>
               <label htmlFor="free-text" className="sr-only">
                 Describe what is happening, or use the buttons above
@@ -163,14 +169,15 @@ export default function HomeClient() {
                 type="text"
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="…or speak / type what's happening (optional)"
+                placeholder={t(language, "inputPlaceholder")}
+                lang={language}
                 maxLength={2000}
                 className="min-h-12 min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-[var(--surface)]/70 px-4 text-sm placeholder:text-[var(--text-soft)]/60 focus:border-[var(--teal)] focus:outline-none"
               />
               <button
                 type="submit"
                 disabled={working || !draft.trim()}
-                aria-label="Send"
+                aria-label={t(language, "send")}
                 className="flex min-h-12 min-w-12 items-center justify-center rounded-xl bg-[var(--teal)]/15 text-[var(--teal)] transition-colors hover:bg-[var(--teal)]/25 disabled:opacity-40"
               >
                 <Send className="h-4 w-4" aria-hidden />
@@ -221,19 +228,18 @@ export default function HomeClient() {
           </>
         )}
 
-        <footer className="mt-auto flex flex-col gap-1.5 border-t border-[var(--line)] pt-5 text-xs text-[var(--text-soft)]">
+        <footer
+          className="mt-auto flex flex-col gap-1.5 border-t border-[var(--line)] pt-5 text-xs text-[var(--text-soft)]"
+          lang={language}
+        >
           <p>
-            IBUKI Circle complements professional and human care — it is not a diagnosis,
-            treatment, or emergency service. In immediate danger, call{" "}
+            {t(language, "footerDisclaimer")}{" "}
             <a href={buildTelLink("112")} className="font-bold text-[var(--crisis-soft)] underline">
               112
             </a>
             .
           </p>
-          <p className="opacity-75">
-            Privacy: what you tap, say, or type is used only to generate this response — never
-            stored on our servers, never shared without your action.
-          </p>
+          <p className="opacity-75">{t(language, "footerPrivacy")}</p>
         </footer>
       </div>
     </main>

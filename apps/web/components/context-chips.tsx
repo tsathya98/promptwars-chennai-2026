@@ -6,6 +6,9 @@
  * (e.g. no "step outside" advice while driving). All chips are one-tap
  * toggles — context never requires typing.
  */
+import type { LanguageCode } from "@/lib/languages";
+import { t, type UIKey } from "@/lib/ui-strings";
+
 export type SituationSetting = "home" | "outside" | "work" | "social" | "driving";
 
 const SETTINGS: readonly SituationSetting[] = ["home", "outside", "work", "social", "driving"];
@@ -13,21 +16,20 @@ const SETTINGS: readonly SituationSetting[] = ["home", "outside", "work", "socia
 type Props = {
   alone: boolean | undefined;
   setting: SituationSetting | undefined;
+  language: LanguageCode;
   onAloneChange: (value: boolean | undefined) => void;
   onSettingChange: (value: SituationSetting | undefined) => void;
 };
 
 /** Renders the one-tap context chips; tapping an active chip clears it. */
-export function ContextChips({ alone, setting, onAloneChange, onSettingChange }: Props) {
+export function ContextChips({ alone, setting, language, onAloneChange, onSettingChange }: Props) {
   return (
-    <div className="flex flex-wrap items-center gap-2" aria-label="Optional situation context">
-      <span className="kicker">[ Right now ]</span>
-      {(
-        [
-          { label: "I'm alone", active: alone === true, next: alone === true ? undefined : true },
-          { label: "With someone", active: alone === false, next: alone === false ? undefined : false },
-        ] as const
-      ).map((chip) => (
+    <div className="flex flex-wrap items-center gap-2" aria-label="Optional situation context" lang={language}>
+      <span className="kicker">[ {t(language, "ctxKicker")} ]</span>
+      {[
+        { label: t(language, "ctxAlone"), active: alone === true, next: alone === true ? undefined : true },
+        { label: t(language, "ctxWithSomeone"), active: alone === false, next: alone === false ? undefined : false },
+      ].map((chip) => (
         <button
           key={chip.label}
           type="button"
@@ -55,7 +57,7 @@ export function ContextChips({ alone, setting, onAloneChange, onSettingChange }:
               : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)]"
           }`}
         >
-          {place}
+          {t(language, `setting_${place}` as UIKey)}
         </button>
       ))}
     </div>

@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Mic, Square } from "lucide-react";
+import type { LanguageCode } from "@/lib/languages";
+import { t } from "@/lib/ui-strings";
 
 type Props = {
   disabled?: boolean;
   /** BCP-47 speech code, e.g. "en-IN", "ta-IN". */
   lang?: string;
+  /** UI language for the button's own labels. */
+  uiLanguage?: LanguageCode;
   onTranscript: (text: string) => void;
 };
 
@@ -42,7 +46,7 @@ const ERROR_HINTS: Record<string, string> = {
  * one-tap buttons remain the primary zero-typing path when unsupported or when
  * microphone permission is declined. Audio and transcripts are never stored.
  */
-export function VoiceControl({ disabled, lang = "en-IN", onTranscript }: Props) {
+export function VoiceControl({ disabled, lang = "en-IN", uiLanguage = "en", onTranscript }: Props) {
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
@@ -152,7 +156,9 @@ export function VoiceControl({ disabled, lang = "en-IN", onTranscript }: Props) 
         ) : (
           <Mic className="h-4 w-4" aria-hidden />
         )}
-        <span className="hidden sm:inline">{listening ? "Listening…" : "Speak"}</span>
+        <span className="hidden sm:inline" lang={uiLanguage}>
+          {listening ? t(uiLanguage, "listening") : t(uiLanguage, "speak")}
+        </span>
       </button>
       {interim && (
         <span className="min-w-0 truncate text-sm italic text-[var(--text-soft)]" aria-live="polite">

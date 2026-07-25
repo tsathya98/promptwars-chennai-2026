@@ -21,7 +21,9 @@ import {
   Users,
   Waves,
 } from "lucide-react";
+import type { LanguageCode } from "@/lib/languages";
 import { COMMAND_BUTTONS, type ActorMode } from "@/lib/safety-router";
+import { t, type UIKey } from "@/lib/ui-strings";
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -51,12 +53,14 @@ function trackSpotlight(e: PointerEvent<HTMLButtonElement>) {
 type Props = {
   mode: ActorMode;
   working: boolean;
+  /** UI language — labels come from the reviewed localization dictionary. */
+  language: LanguageCode;
   onModeChange: (mode: ActorMode) => void;
   onCommand: (buttonId: string) => void;
 };
 
 /** Renders the mode toggle, hero prompt, and one-tap command grid. */
-export function CommandDock({ mode, working, onModeChange, onCommand }: Props) {
+export function CommandDock({ mode, working, language, onModeChange, onCommand }: Props) {
   const buttons = useMemo(() => COMMAND_BUTTONS.filter((b) => b.mode === mode), [mode]);
 
   return (
@@ -64,8 +68,8 @@ export function CommandDock({ mode, working, onModeChange, onCommand }: Props) {
       <div className="flex gap-2 rounded-2xl border border-[var(--line)] bg-[var(--surface)]/70 p-1.5">
         {(
           [
-            { id: "individual", label: "I need support", Ico: HeartHandshake },
-            { id: "caregiver", label: "I'm supporting someone", Ico: Users },
+            { id: "individual", label: t(language, "modeIndividual"), Ico: HeartHandshake },
+            { id: "caregiver", label: t(language, "modeCaregiver"), Ico: Users },
           ] as const
         ).map(({ id, label, Ico }) => (
           <button
@@ -88,8 +92,10 @@ export function CommandDock({ mode, working, onModeChange, onCommand }: Props) {
       </div>
 
       <section aria-label="One-tap support commands" className="flex flex-col gap-3">
-        <h2 className="hero-serif text-3xl leading-tight md:text-[42px]">
-          What do you need <span className="text-[var(--teal)]">right now</span>?
+        <h2 className="hero-serif text-3xl leading-tight md:text-[42px]" lang={language}>
+          {t(language, "heroLead")}
+          <span className="text-[var(--teal)]">{t(language, "heroEmphasis")}</span>
+          {t(language, "heroTail")}
         </h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
           {buttons.map((btn) => {
@@ -124,10 +130,12 @@ export function CommandDock({ mode, working, onModeChange, onCommand }: Props) {
                 >
                   <ButtonIcon className="h-5 w-5" />
                 </span>
-                <span>
-                  <span className="block text-[15px] font-bold leading-snug">{btn.label}</span>
+                <span lang={language}>
+                  <span className="block text-[15px] font-bold leading-snug">
+                    {t(language, `cmd_${btn.id}_label` as UIKey)}
+                  </span>
                   <span className="mt-1 block text-xs leading-snug text-[var(--text-soft)]">
-                    {btn.description}
+                    {t(language, `cmd_${btn.id}_desc` as UIKey)}
                   </span>
                 </span>
               </button>

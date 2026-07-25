@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { POST as guestPost } from "@/app/api/auth/guest/route";
 import { POST as loginPost } from "@/app/api/auth/login/route";
+import { POST as intervenePost } from "@/app/api/intervene/route";
 import { POST as speechPost } from "@/app/api/speech/route";
 
 /** Builds a JSON POST Request for direct route-handler invocation. */
@@ -44,6 +45,31 @@ describe("demo auth routes", () => {
     const res = await guestPost();
     expect(res.status).toBe(200);
     expect(res.headers.get("set-cookie")).toContain("ibuki-session=guest-");
+  });
+});
+
+describe("intervene route validation (precedes any model call)", () => {
+  it("rejects oversized bodies with 413", async () => {
+    const res = await intervenePost(
+      new Request("http://test/api/intervene", {
+        method: "POST",
+        headers: { "content-length": "999999", "Content-Type": "application/json" },
+        body: "{}",
+      }),
+    );
+    expect(res.status).toBe(413);
+  });
+
+  it("rejects non-JSON bodies with 400", async () => {
+    const res = await intervenePost(
+      new Request("http://test/api/intervene", { method: "POST", body: "not json" }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects schema-invalid requests with 400", async () => {
+    const res = await intervenePost(jsonRequest("/api/intervene", { mode: "individual" }));
+    expect(res.status).toBe(400);
   });
 });
 

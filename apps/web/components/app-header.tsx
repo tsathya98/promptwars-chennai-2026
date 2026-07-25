@@ -7,6 +7,7 @@
  */
 import { Siren } from "lucide-react";
 import { LANGUAGE_CODES, LANGUAGES, type LanguageCode } from "@/lib/languages";
+import { t } from "@/lib/ui-strings";
 
 type Props = {
   /** Crisis mode hides the controls; the crisis view carries its own actions. */
@@ -56,7 +57,7 @@ export function AppHeader({ crisis, language, onLanguageChange, onEmergency }: P
             className="flex min-h-14 items-center gap-2 rounded-xl border-2 border-[var(--crisis)] bg-[var(--crisis)]/15 px-5 font-bold text-[var(--crisis-soft)] transition-colors hover:bg-[var(--crisis)]/30"
           >
             <Siren className="h-5 w-5" aria-hidden />
-            Emergency help
+            <span lang={language}>{t(language, "emergencyHelp")}</span>
           </button>
         </div>
       )}
