@@ -21,6 +21,7 @@
   --indigo: #c4b5fd; /* soft violet — human connection & caregiver actions */
   --amber: #f5c84c; /* small attention accents + focus ring ONLY */
   --crisis: #c73a44; /* Level-1 emergency ONLY; 5.1:1 with white text (WCAG AA) */
+  --crisis-strong: #a92e37; /* hover/active state of crisis actions */
   --crisis-soft: #ffb3ab;
   /* SpotlightCard + generic accent consumers read this token. */
   --accent: #7af3d0;

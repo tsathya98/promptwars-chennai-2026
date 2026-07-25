@@ -16,8 +16,10 @@ function getClient(): OpenAI {
     // rejects it with `incorrect_hostname`.
     baseURL: process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1",
     // Hard latency ceiling: a hung request must fail fast enough for the
-    // cross-provider fallback to engage on a crisis endpoint.
+    // cross-provider fallback to engage on a crisis endpoint. withRetry()
+    // owns retries — SDK-internal retries would stretch worst-case failover.
     timeout: 15_000,
+    maxRetries: 0,
   });
   return cachedClient;
 }

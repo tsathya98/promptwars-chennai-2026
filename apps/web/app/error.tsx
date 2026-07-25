@@ -5,6 +5,7 @@
  * user still gets an honest explanation, a retry, and the verified helplines —
  * a crisis-support surface must never dead-end. No model claims are made here.
  */
+import { useEffect } from "react";
 import { PhoneCall, RotateCcw } from "lucide-react";
 
 const HELPLINES = [
@@ -14,11 +15,17 @@ const HELPLINES = [
 ] as const;
 
 export default function ErrorBoundary({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    // Digest/message only — never user content (nothing sensitive is in scope here).
+    console.error("app error boundary:", error.digest ?? error.message);
+  }, [error]);
+
   return (
     <main id="main" className="flex min-h-screen items-center justify-center px-4">
       <div className="surface flex w-full max-w-md flex-col gap-4 p-6">

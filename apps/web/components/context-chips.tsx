@@ -35,7 +35,7 @@ export function ContextChips({ alone, setting, language, onAloneChange, onSettin
           type="button"
           onClick={() => onAloneChange(chip.next)}
           aria-pressed={chip.active}
-          className={`min-h-11 rounded-full border px-3.5 text-xs font-semibold transition-colors ${
+          className={`min-h-12 rounded-full border px-4 text-xs font-semibold transition-colors ${
             chip.active
               ? "border-[var(--indigo)]/60 bg-[var(--indigo)]/15 text-[var(--indigo)]"
               : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)]"
@@ -51,7 +51,7 @@ export function ContextChips({ alone, setting, language, onAloneChange, onSettin
           type="button"
           onClick={() => onSettingChange(setting === place ? undefined : place)}
           aria-pressed={setting === place}
-          className={`min-h-11 rounded-full border px-3.5 text-xs font-semibold capitalize transition-colors ${
+          className={`min-h-12 rounded-full border px-4 text-xs font-semibold capitalize transition-colors ${
             setting === place
               ? "border-[var(--teal)]/60 bg-[var(--teal)]/12 text-[var(--teal)]"
               : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)]"

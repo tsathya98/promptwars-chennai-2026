@@ -93,9 +93,10 @@ export async function orchestrate(input: InterveneRequest, emit: Emit): Promise<
     modelUsed = result.model;
     generation.done(`${agent.label} plan generated`);
   } catch (err) {
+    // Provider error internals never reach the client stream (parity with /api/health).
     generation.fail(
       "AI generation unavailable — falling back to verified guidance",
-      err instanceof Error ? err.message.slice(0, 140) : undefined,
+      err instanceof Error ? "provider error" : undefined,
     );
   }
 

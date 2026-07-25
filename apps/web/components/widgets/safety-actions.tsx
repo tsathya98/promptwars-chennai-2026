@@ -37,14 +37,14 @@ export function SafetyActions({ spec, emergency }: Props) {
               href={buildTelLink(r.phone)}
               className={`flex min-h-14 items-center gap-3 rounded-xl px-4 py-3 font-bold transition-colors ${
                 emergency || r.id === "erss-112"
-                  ? "bg-[var(--crisis)] text-white hover:bg-[#a92e37]"
+                  ? "bg-[var(--crisis)] text-white hover:bg-[var(--crisis-strong)]"
                   : "bg-[var(--teal)]/12 text-[var(--teal)] hover:bg-[var(--teal)]/20"
               }`}
             >
               <PhoneCall className="h-5 w-5 shrink-0" aria-hidden />
               <span className="flex flex-col text-left">
                 <span className="text-base leading-tight">Call {r.phone}</span>
-                <span className="text-xs font-medium opacity-85">{r.title}</span>
+                <span className="text-xs font-medium">{r.title}</span>
               </span>
             </a>
           ) : (

@@ -108,7 +108,7 @@ export function BreathingGuide({ inhaleSeconds, holdSeconds, exhaleSeconds, cycl
         {!done && (
           <button
             type="button"
-            onClick={() => (running ? setRunning(false) : done ? restart() : setRunning(true))}
+            onClick={() => setRunning(!running)}
             className="flex min-h-12 items-center gap-2 rounded-xl bg-[var(--teal)]/15 px-5 py-2.5 text-sm font-semibold text-[var(--teal)] transition-colors hover:bg-[var(--teal)]/25"
           >
             {running ? <Pause className="h-4 w-4" aria-hidden /> : <Play className="h-4 w-4" aria-hidden />}

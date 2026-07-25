@@ -52,7 +52,7 @@ export function CaregiverGuidance({ spec }: Props) {
         </p>
         <a
           href={buildTelLink("112")}
-          className="flex min-h-11 items-center gap-2 rounded-lg bg-[var(--crisis)] px-4 text-sm font-bold text-white hover:bg-[#a92e37]"
+          className="flex min-h-11 items-center gap-2 rounded-lg bg-[var(--crisis)] px-4 text-sm font-bold text-white hover:bg-[var(--crisis-strong)]"
         >
           <PhoneCall className="h-4 w-4" aria-hidden />
           Call 112 now

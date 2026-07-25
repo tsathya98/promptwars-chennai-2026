@@ -40,7 +40,8 @@ export function ResultPanel({ status, response, error, events, onRetry }: Props)
     <div className="grid gap-4 md:grid-cols-[1fr_270px]">
       <div className="flex flex-col gap-4" aria-busy={status === "working"}>
         {status === "working" && (
-          <div aria-label="Preparing your support plan" className="flex flex-col gap-3">
+          <div role="status" className="flex flex-col gap-3">
+            <span className="sr-only">Preparing your support plan…</span>
             <div className="shimmer h-36" />
             <div className="grid gap-3 md:grid-cols-2">
               <div className="shimmer h-28" />

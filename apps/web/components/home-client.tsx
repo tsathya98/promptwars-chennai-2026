@@ -13,6 +13,7 @@
  * router sees identical requests regardless of input method.
  */
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { AudioLines, Send } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { CommandDock } from "@/components/command-dock";
@@ -20,7 +21,6 @@ import { ContextChips, type SituationSetting } from "@/components/context-chips"
 import { CrisisView } from "@/components/crisis-view";
 import { CursorField } from "@/components/cursor-field";
 import { HowItWorks } from "@/components/how-it-works";
-import { LiveVoice } from "@/components/live-voice";
 import { ResultPanel } from "@/components/result-panel";
 import { VoiceControl } from "@/components/voice-control";
 import { Widget } from "@/components/widget-renderer";
@@ -31,6 +31,12 @@ import type { InterveneRequestInput, WidgetSpec } from "@/lib/schemas";
 import { t } from "@/lib/ui-strings";
 import { useIntervene } from "@/lib/use-intervene";
 import type { VoiceToolAction } from "@/lib/voice-tools";
+
+/** WebRTC is client-only; loading it on demand keeps the initial bundle lean. */
+const LiveVoice = dynamic(
+  () => import("@/components/live-voice").then((m) => m.LiveVoice),
+  { ssr: false },
+);
 
 export default function HomeClient() {
   const [mode, setMode] = useState<ActorMode>("individual");
