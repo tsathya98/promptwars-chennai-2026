@@ -8,6 +8,7 @@
  * activity rail sits alongside on desktop and below on mobile.
  */
 import { AGENTS } from "@/lib/agents/registry";
+import { EMERGENCY_RESOURCE_ID, HELPLINE_RESOURCE_IDS } from "@/lib/resources";
 import type { ActivityEvent, AgentResponse } from "@/lib/schemas";
 import type { InterveneStatus } from "@/lib/use-intervene";
 import { ActivityRail } from "./activity-rail";
@@ -88,7 +89,7 @@ export function ResultPanel({ status, response, error, events, onRetry }: Props)
               spec={{
                 type: "safety-actions",
                 source: "verified",
-                resourceIds: ["erss-112", "deaddiction-14446", "telemanas-14416"],
+                resourceIds: [EMERGENCY_RESOURCE_ID, ...HELPLINE_RESOURCE_IDS],
                 note: "Verified helplines — available even when AI is not.",
               }}
             />

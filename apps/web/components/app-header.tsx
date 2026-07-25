@@ -42,7 +42,7 @@ export function AppHeader({ crisis, language, onLanguageChange, onEmergency }: P
             id="language-select"
             value={language}
             onChange={(e) => onLanguageChange(e.target.value as LanguageCode)}
-            className="min-h-11 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--text-soft)] focus:border-[var(--teal)] focus:outline-none"
+            className="min-h-12 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2.5 text-sm text-[var(--text-soft)] focus:border-[var(--teal)] focus:outline-none"
           >
             {LANGUAGE_CODES.map((code) => (
               <option key={code} value={code}>

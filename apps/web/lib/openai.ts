@@ -15,6 +15,9 @@ function getClient(): OpenAI {
     // The project key is region-pinned; the default api.openai.com host
     // rejects it with `incorrect_hostname`.
     baseURL: process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1",
+    // Hard latency ceiling: a hung request must fail fast enough for the
+    // cross-provider fallback to engage on a crisis endpoint.
+    timeout: 15_000,
   });
   return cachedClient;
 }

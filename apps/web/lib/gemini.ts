@@ -9,7 +9,11 @@ export const GEMINI_MODELS = {
 let cachedClient: GoogleGenAI | null = null;
 
 function getClient(): GoogleGenAI {
-  cachedClient ??= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  cachedClient ??= new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    // Hard latency ceiling so the cross-provider fallback engages on hangs.
+    httpOptions: { timeout: 15_000 },
+  });
   return cachedClient;
 }
 

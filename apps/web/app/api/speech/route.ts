@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
+import { allowRequest, clientKey, rateLimitResponse } from "@/lib/rate-limit";
 
 export const maxDuration = 30;
 
@@ -18,6 +19,7 @@ const speechRequestSchema = z.object({
  * Text is converted and streamed back — never logged or stored.
  */
 export async function POST(req: Request) {
+  if (!allowRequest("speech", clientKey(req), 30)) return rateLimitResponse();
   const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_AI_API_KEY;
   const baseUrl = process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1";
   if (!apiKey) {
@@ -42,6 +44,7 @@ export async function POST(req: Request) {
 
   const res = await fetch(`${baseUrl}/audio/speech`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: TTS_MODEL,

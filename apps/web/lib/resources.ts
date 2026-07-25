@@ -16,8 +16,16 @@ export type VerifiedResource = {
   reviewedOn: string;
 };
 
+/** Bumped whenever registry content changes; reported by /api/health. */
 export const REGISTRY_VERSION = "2026-07-25.1";
 
+/** India's unified emergency number resource (ERSS 112). */
+export const EMERGENCY_RESOURCE_ID = "erss-112";
+
+/** The two national support helplines attached to urgent (non-emergency) flows. */
+export const HELPLINE_RESOURCE_IDS = ["deaddiction-14446", "telemanas-14416"] as const;
+
+/** The reviewed registry — the only source of numbers, protocols, and claims. */
 export const VERIFIED_RESOURCES: readonly VerifiedResource[] = [
   {
     id: "erss-112",
@@ -109,10 +117,12 @@ export const VERIFIED_RESOURCES: readonly VerifiedResource[] = [
   },
 ] as const;
 
+/** Looks up a registry entry by id; undefined for anything unregistered. */
 export function getResource(id: string): VerifiedResource | undefined {
   return VERIFIED_RESOURCES.find((r) => r.id === id);
 }
 
+/** True only for ids in the reviewed registry — the model cannot invent one. */
 export function isResourceId(id: string): boolean {
   return VERIFIED_RESOURCES.some((r) => r.id === id);
 }

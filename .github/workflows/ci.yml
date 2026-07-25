@@ -38,6 +38,8 @@ jobs:
       - name: Lint
         run: pnpm nx lint web
       - name: Test with coverage
+        # Explicit bash => `-eo pipefail`, so vitest failures cannot be masked by tee.
+        shell: bash
         run: |
           pnpm --filter @promptwars/web exec vitest run --coverage.enabled --coverage.reporter=text-summary --coverage.reporter=text 2>&1 | tee /tmp/vitest.log
           { echo '### Test coverage'; echo '```'; grep -A 10 "Coverage report" /tmp/vitest.log | head -12; echo '```'; } >> "$GITHUB_STEP_SUMMARY" || true

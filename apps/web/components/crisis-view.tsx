@@ -43,7 +43,7 @@ export function CrisisView({ response, onExit }: Props) {
       <a
         ref={callRef}
         href={buildTelLink("112")}
-        className="flex min-h-16 items-center justify-center gap-3 rounded-2xl bg-[var(--crisis)] text-xl font-extrabold text-white transition-colors hover:bg-[#c73a44]"
+        className="flex min-h-16 items-center justify-center gap-3 rounded-2xl bg-[var(--crisis)] text-xl font-extrabold text-white transition-colors hover:bg-[#a92e37]"
       >
         <PhoneCall className="h-6 w-6" aria-hidden />
         Call 112 now

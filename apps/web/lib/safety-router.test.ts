@@ -79,6 +79,12 @@ describe("deterministic safety router", () => {
     }
   });
 
+  it("matches urgency hints on word boundaries, not substrings", () => {
+    // "encourage" contains "urge"; word-boundary matching must not trip it.
+    const result = route({ mode: "individual", text: "I want to encourage my friend" });
+    expect(result.riskLevel).toBe("steady");
+  });
+
   it("keeps a craving urgent but never emergency", () => {
     const result = route({ mode: "individual", text: "the craving is unbearable right now" });
     expect(result.level).toBe(2);

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { clampInt } from "./clamp";
+import { HELPLINE_RESOURCE_IDS } from "./resources";
 import { widgetSpecSchema, type WidgetSpec } from "./schemas";
 
 /**
@@ -87,11 +89,6 @@ export type VoiceToolResult = {
   action?: VoiceToolAction;
 };
 
-const clampInt = (n: unknown, min: number, max: number, fallback: number) =>
-  typeof n === "number" && Number.isFinite(n)
-    ? Math.min(max, Math.max(min, Math.round(n)))
-    : fallback;
-
 const situationSchema = z.object({ situation: z.string().trim().min(1).max(500) });
 const messageSchema = z.object({ message: z.string().trim().min(1).max(320) });
 
@@ -151,7 +148,7 @@ export function executeVoiceTool(name: string, rawArgs: unknown): VoiceToolResul
       const widget = widgetSpecSchema.parse({
         type: "safety-actions",
         source: "verified",
-        resourceIds: ["deaddiction-14446", "telemanas-14416"],
+        resourceIds: [...HELPLINE_RESOURCE_IDS],
         note: "Free, confidential helplines — talking to a person helps.",
       });
       return {

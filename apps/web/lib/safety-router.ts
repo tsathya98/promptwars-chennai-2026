@@ -176,6 +176,7 @@ const EMERGENCY_MATCHERS = EMERGENCY_PHRASES.map((phrase) => ({
   re: new RegExp(`\\b${escapeRegex(phrase)}\\b`, "i"),
 }));
 
+/** Time-sensitive distress signals (word-boundary matched, like emergencies). */
 const URGENT_HINTS: readonly string[] = [
   "urge",
   "craving",
@@ -198,6 +199,7 @@ const URGENT_HINTS: readonly string[] = [
   "distressed",
 ] as const;
 
+/** Education/resource-seeking signals that route to the Resource Navigator. */
 const EDUCATION_HINTS: readonly string[] = [
   "what is",
   "what are",
@@ -212,6 +214,13 @@ const EDUCATION_HINTS: readonly string[] = [
   "rehab",
   "naloxone",
 ] as const;
+
+/** Router input: the actor mode plus a command id and/or free text. */
+const toMatchers = (phrases: readonly string[]) =>
+  phrases.map((p) => new RegExp(`\\b${escapeRegex(p)}\\b`, "i"));
+
+const URGENT_MATCHERS = toMatchers(URGENT_HINTS);
+const EDUCATION_MATCHERS = toMatchers(EDUCATION_HINTS);
 
 /** Router input: the actor mode plus a command id and/or free text. */
 export type RouteInput = { mode: ActorMode; buttonId?: string; text?: string };
@@ -259,8 +268,7 @@ export function route(input: RouteInput): RouteResult {
     };
   }
 
-  const t = text.toLowerCase();
-  const urgent = URGENT_HINTS.some((h) => t.includes(h));
+  const urgent = URGENT_MATCHERS.some((re) => re.test(text));
 
   if (input.mode === "caregiver") {
     return {
@@ -273,7 +281,7 @@ export function route(input: RouteInput): RouteResult {
   if (urgent) {
     return { level: 2, riskLevel: "urgent", agentId: "recovery-coach", via: "text" };
   }
-  if (EDUCATION_HINTS.some((h) => t.includes(h))) {
+  if (EDUCATION_MATCHERS.some((re) => re.test(text))) {
     return { level: 3, riskLevel: "steady", agentId: "resource-navigator", via: "text" };
   }
   return { level: 3, riskLevel: "steady", agentId: "recovery-coach", via: "text" };

@@ -179,6 +179,7 @@ export default function HomeClient() {
 
             {liveVoiceOpen && (
               <LiveVoice
+                key={`${mode}-${language}`}
                 mode={mode}
                 language={language}
                 onToolAction={handleVoiceTool}

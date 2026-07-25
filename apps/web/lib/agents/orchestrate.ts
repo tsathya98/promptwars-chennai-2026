@@ -1,6 +1,13 @@
+import { clampInt, clampList, clampText } from "../clamp";
 import { LANGUAGES } from "../languages";
 import { generateIntent } from "../model-provider";
-import { getResource, isResourceId, resourceCatalogForPrompt } from "../resources";
+import {
+  EMERGENCY_RESOURCE_ID,
+  getResource,
+  HELPLINE_RESOURCE_IDS,
+  isResourceId,
+  resourceCatalogForPrompt,
+} from "../resources";
 import { getButton, route, type RouteResult } from "../safety-router";
 import {
   agentResponseSchema,
@@ -47,12 +54,6 @@ function beginStage(emit: Emit, stage: ActivityEvent["stage"], label: string) {
     fail: (finalLabel?: string, detail?: string) => finish("failed", finalLabel, detail),
   };
 }
-
-const clampText = (s: string, max: number) => s.trim().slice(0, max);
-const clampInt = (n: number, min: number, max: number, fallback: number) =>
-  Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n))) : fallback;
-const clampList = (xs: string[], max: number) =>
-  xs.map((x) => x.trim()).filter(Boolean).slice(0, max);
 
 /**
  * Full intervention pipeline. Streams real pipeline stages as activity events
@@ -193,7 +194,7 @@ export function compileResponse(
     widgets.push({
       type: "safety-actions",
       source: "verified",
-      resourceIds: ["deaddiction-14446", "telemanas-14416"],
+      resourceIds: [...HELPLINE_RESOURCE_IDS],
       note: "Free, confidential helplines — talking to a person helps.",
     });
   }
@@ -230,7 +231,7 @@ export function emergencyResponse(input: InterveneRequest): AgentResponse {
     {
       type: "safety-actions",
       source: "verified",
-      resourceIds: ["erss-112"],
+      resourceIds: [EMERGENCY_RESOURCE_ID],
       note: "If someone may be overdosing or is in danger, calling 112 comes first.",
     },
     { type: "verified-resource", source: "verified", resourceId: "overdose-response", note: null },
@@ -276,7 +277,7 @@ export function verifiedFallback(input: InterveneRequest, routed: RouteResult): 
   widgets.push({
     type: "safety-actions",
     source: "verified",
-    resourceIds: ["deaddiction-14446", "telemanas-14416"],
+    resourceIds: [...HELPLINE_RESOURCE_IDS],
     note: "These verified helplines work even when AI generation doesn't.",
   });
 

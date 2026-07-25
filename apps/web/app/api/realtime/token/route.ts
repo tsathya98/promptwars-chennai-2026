@@ -1,3 +1,5 @@
+import { LANGUAGES, type LanguageCode } from "@/lib/languages";
+import { allowRequest, clientKey, rateLimitResponse } from "@/lib/rate-limit";
 import { VOICE_TOOL_DEFINITIONS } from "@/lib/voice-tools";
 
 export const maxDuration = 30;
@@ -5,21 +7,12 @@ export const maxDuration = 30;
 /** Verified via live smoke test against the region-pinned host (2026-07-25). */
 const REALTIME_MODEL = "gpt-realtime";
 
-const LANGUAGE_NAMES: Record<string, string> = {
-  ta: "Tamil",
-  hi: "Hindi",
-  bn: "Bengali",
-  te: "Telugu",
-  mr: "Marathi",
-  kn: "Kannada",
-  ml: "Malayalam",
-};
-
 function voiceInstructions(mode: "individual" | "caregiver", language?: string): string {
-  const languageRule =
-    language && LANGUAGE_NAMES[language]
-      ? `\n- Speak in ${LANGUAGE_NAMES[language]}, in simple everyday words. Keep helpline numbers unchanged.`
-      : "";
+  // ALWAYS pin the spoken language (English included) — without an explicit
+  // rule the realtime model auto-detects from accent and can drift languages.
+  const name =
+    language && language in LANGUAGES ? LANGUAGES[language as LanguageCode].name : "English";
+  const languageRule = `\n- Speak in ${name}, in simple everyday words. Keep helpline numbers unchanged. Switch language only if the user clearly asks you to.`;
   return baseVoiceInstructions(mode) + languageRule;
 }
 
@@ -49,6 +42,7 @@ After a tool call, briefly tell them what appeared on screen. Never claim you se
  * server-side; the browser only ever sees the ephemeral token.
  */
 export async function POST(req: Request) {
+  if (!allowRequest("realtime-token", clientKey(req), 10)) return rateLimitResponse();
   const apiKey = process.env.OPENAI_API_KEY || process.env.OPEN_AI_API_KEY;
   const baseUrl = process.env.OPENAI_BASE_URL ?? "https://us.api.openai.com/v1";
   if (!apiKey) {
@@ -67,6 +61,7 @@ export async function POST(req: Request) {
 
   const res = await fetch(`${baseUrl}/realtime/client_secrets`, {
     method: "POST",
+    signal: AbortSignal.timeout(15_000),
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       expires_after: { anchor: "created_at", seconds: 600 },

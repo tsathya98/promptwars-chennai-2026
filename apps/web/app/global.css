@@ -20,7 +20,7 @@
   --teal: #7af3d0; /* mint — routine support & primary recovery actions */
   --indigo: #c4b5fd; /* soft violet — human connection & caregiver actions */
   --amber: #f5c84c; /* small attention accents + focus ring ONLY */
-  --crisis: #e5484d; /* Level-1 emergency ONLY */
+  --crisis: #c73a44; /* Level-1 emergency ONLY; 5.1:1 with white text (WCAG AA) */
   --crisis-soft: #ffb3ab;
   /* SpotlightCard + generic accent consumers read this token. */
   --accent: #7af3d0;

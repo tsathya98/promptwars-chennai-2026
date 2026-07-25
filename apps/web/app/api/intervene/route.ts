@@ -1,4 +1,5 @@
 import { orchestrate } from "@/lib/agents/orchestrate";
+import { allowRequest, clientKey, rateLimitResponse } from "@/lib/rate-limit";
 import { interveneRequestSchema, type InterveneFrame } from "@/lib/schemas";
 
 export const maxDuration = 60;
@@ -11,6 +12,7 @@ const MAX_BODY_BYTES = 16_000;
  * pipeline stage, then the final validated AgentResponse.
  */
 export async function POST(req: Request) {
+  if (!allowRequest("intervene", clientKey(req), 20)) return rateLimitResponse();
   const contentLength = Number(req.headers.get("content-length") ?? "0");
   if (contentLength > MAX_BODY_BYTES) {
     return Response.json({ error: "Request body too large." }, { status: 413 });
