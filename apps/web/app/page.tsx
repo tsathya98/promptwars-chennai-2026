@@ -25,7 +25,7 @@ export default function Home() {
     {
       role: "assistant",
       content:
-        "Welcome to Aura. I am your 24/7 recovery and caregiver assistant powered by gpt-5.6-terra. Use the zero-typing emergency buttons above or ask me anything below.",
+        "Welcome to IBUKI Circle. I am your 24/7 recovery and caregiver assistant powered by gpt-5.6-terra. Use the zero-typing emergency buttons above or ask me anything below.",
     },
   ]);
   const [chatLoading, setChatLoading] = useState(false);
@@ -128,7 +128,7 @@ export default function Home() {
             <div className="flex items-center gap-3 mb-2">
               <span className="text-3xl">🛡️</span>
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-indigo-300 to-pink-400 bg-clip-text text-transparent">
-                AURA
+                IBUKI Circle
               </h1>
               <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono font-medium">
                 Recovery & Prevention Platform
@@ -398,7 +398,7 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🤖</span>
                   <div>
-                    <div className="text-xs font-bold text-slate-100">Aura AI Coach</div>
+                    <div className="text-xs font-bold text-slate-100">IBUKI Circle AI Coach</div>
                     <div className="text-[10px] font-mono text-emerald-400">gpt-5.6-terra Connected</div>
                   </div>
                 </div>

@@ -1,11 +1,14 @@
 <div align="center">
 
-# AURA — Recovery & Prevention Platform
+# IBUKI Circle — Recovery & Prevention Platform
 
 ### Real-time GenAI emergency de-escalation, zero-typing interventions & caregiver support under high cognitive load.
 
+[![Live Demo](https://img.shields.io/badge/▲_Live_Demo-visit_app-000000?style=for-the-badge)](https://web-delta-three-92.vercel.app)
 [![Built at PromptWars](https://img.shields.io/badge/PromptWars_Chennai-Google_for_Developers-EA4335?style=for-the-badge)](https://hack2skill.com)
 [![Model](https://img.shields.io/badge/GPT--5.6--Terra-OpenAI-000000?style=for-the-badge)](https://openai.com)
+
+**[Try it live](https://web-delta-three-92.vercel.app)**
 
 </div>
 
@@ -15,7 +18,7 @@
 
 Individuals navigating substance use disorders and their families face overwhelming distress during acute craving peaks and crisis moments. High cognitive stress makes typing or searching for support nearly impossible. Current resources are often static, text-heavy, or require complex manual navigation when immediate de-escalation is needed most.
 
-## What AURA does
+## What IBUKI Circle does
 
 - 🔴 **Zero-Typing Emergency Interventions**: 1-tap instant action triggers for craving peaks, panic, and impulse risk without requiring user typing.
 - ⚡ **Real-Time De-Escalation Protocols**: Generates 3-step physical and sensory grounding directives tailored to the user's distress state.
