@@ -37,11 +37,13 @@ A feature is NOT done until ALL of these hold. If time runs short, drop the next
 
 ## 3. Strict Scope Control
 
-- **DO NOT BUILD**: Custom authentication or user accounts (exception: if the problem demands identity or a login adds demo value, use the `google-auth` skill — Auth.js v5 + Google, ~20 min, guest-mode fallback mandatory), database setup (Postgres/DynamoDB), settings screens, multi-tenancy, i18n, micro-frontends, or heavy testing suites.
+- **DO NOT BUILD**: Custom authentication, user accounts, database setup,
+  settings screens, multi-tenancy, micro-frontends, or heavy testing suites unless
+  the user explicitly expands scope and the existing submission remains green.
 - **MUST BUILD**:
-  - `GET /api/health` route pinging whichever model actually powers the app (no
-    vendor restriction — `gemini-3.5-flash-lite` and `gpt-5.6-terra` low-effort are
-    both cheap enough for a health ping; see `gemini`/`openai` skills).
+  - `GET /api/health` route pinging the model that actually powers the app. The
+    current lane uses `gpt-5.6-terra` with low reasoning effort; see the `openai`
+    skill.
   - Loading skeleton states for generative UI.
   - Friendly error boundaries (no raw JSON/red overlays).
   - One-click "Try Example" chips pre-loaded with optimal demo queries.
@@ -71,7 +73,10 @@ Judges and mentors WILL open the repo. Maintain from the first hour (not retrofi
 
 ## 6. Code & Architecture Discipline
 
-- **Nx monorepo (pre-scaffolded)**: `apps/web` = Next.js 16 App Router + React 19 + TypeScript + Tailwind CSS 4 (+ shadcn/ui); `apps/backend` = optional uv-managed FastAPI sidecar. Run everything through `pnpm nx ...` (`dev web`, `test web`, `lint web`, `build web`, `serve backend`). Do NOT create new apps/libs mid-hackathon unless the problem truly demands it.
+- **Nx workspace**: `apps/web` is the complete submission: Next.js 16 App Router,
+  React 19, TypeScript, and Tailwind CSS 4. Run everything through `pnpm nx ...`
+  (`dev web`, `test web`, `lint web`, `build web`). Do not create new apps or
+  libraries mid-hackathon unless the problem truly demands it.
 - **Centralized Wrapper**: Route active provider calls through the corresponding
   server-only wrapper. The current submission uses `lib/openai.ts`; if the provider
   changes, create one equivalent wrapper rather than scattering SDK calls.

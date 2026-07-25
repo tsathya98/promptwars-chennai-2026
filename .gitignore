@@ -49,3 +49,23 @@ temp
 tmp
 artifacts
 .env*
+
+# ── local hackathon preparation archive ──────────────────
+# Keep these available locally, but exclude them from the jury-facing
+# submission. The shipped product is apps/web plus docs/00, docs/06, and
+# docs/07; these paths are pre-event scaffolding or unused provider lanes.
+KIT.md
+apps/backend/
+docs/01-hackathon-briefing.md
+docs/02-google-stack.md
+docs/03-techstack-blueprint.md
+docs/04-takeda-patterns.md
+docs/05-antigravity-programmatic.md
+prompts/
+starters/
+.claude/skills/antigravity/
+.claude/skills/gemini/
+.claude/skills/google-auth/
+.agents/skills/antigravity/
+.agents/skills/gemini/
+.agents/skills/google-auth/

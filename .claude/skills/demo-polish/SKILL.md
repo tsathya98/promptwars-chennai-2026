@@ -10,11 +10,9 @@ When feature freeze is called or the configured submission deadline is approachi
 ## Step 1: Error-Proof All Visible User Paths
 
 1. **Graceful Error Boundaries**: Wrap every Gemini call and API route in a try-catch block that renders a styled, friendly UI message on failure (never show unhandled stack traces, raw error JSON, or red Next.js dev overlays).
-2. **Fallback Ladder Verification**: Test whichever fallback ladder the app actually
-   uses with a controlled local or preview-deployment failure — e.g.
-   `gemini-3.6-flash` → `gemini-3.5-flash-lite` →
-   `GEMINI_API_KEY_FALLBACK` on the Gemini lane, or the equivalent retry-once
-   behavior in `lib/openai.ts` on the OpenAI lane. Never invalidate or rotate the
+2. **Fallback Verification**: Test the retry-once behavior in
+   `apps/web/lib/openai.ts` and the source-labelled verified fallback with a
+   controlled local or preview-deployment failure. Never invalidate or rotate the
    production key immediately before the pitch.
 3. **Empty State Guards**: Ensure every table, chart, list, and card component handles empty or null data gracefully without crashing or breaking layout.
 4. **Console Hygiene**: Clear out all dev console errors, warnings, and unhandled rejections on the **deployed Vercel URL** (test on actual deployment, not localhost).
@@ -49,7 +47,10 @@ Disqualification rules (docs/00) are zero-tolerance — audit for them explicitl
      - *Beat 1*: Action taken → UI outcome → Why it matters.
      - *Beat 2*: Action taken → UI outcome → Why it matters.
      - *Beat 3*: Action taken → UI outcome → Why it matters.
-   - **Tech Stack Bullet Points**: Name-check whichever models/providers actually power the app (e.g. **Gemini 3.6 Flash** + **Google Search Grounding** + **Antigravity**, or **GPT-5.6 Terra**, or a mix), plus **Structured Outputs** and **Vercel AI SDK** — no vendor is mandatory to mention, just be accurate about what's actually running.
+   - **Tech Stack Bullet Points**: Name the models and services that actually power
+     the app: **GPT-5.6 Terra**, **gpt-realtime**, **Structured Outputs**, and the
+     deterministic safety/widget/connector libraries. Mention only installed and
+     working technology.
    - **Next Steps & Contact**: One concluding line.
 3. **Generate QR Code**:
    - Generate `public/qr.png` pointing to the live deployed Vercel URL using `pnpm dlx qrcode <DEPLOYED_URL> -o public/qr.png`.

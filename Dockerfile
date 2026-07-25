@@ -1,6 +1,5 @@
 # Next.js (apps/web) standalone image — Nx monorepo, pnpm via corepack.
 # Build from REPO ROOT: docker build -t promptwars .
-# NOTE: agy does not exist in containers — LLM_PROVIDER forced to `api`.
 FROM node:22-alpine AS build
 WORKDIR /repo
 RUN corepack enable
@@ -13,7 +12,7 @@ RUN pnpm nx build web
 
 FROM node:22-alpine AS run
 WORKDIR /app
-ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 LLM_PROVIDER=api PORT=3000
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
 RUN addgroup -S app && adduser -S app -G app
 COPY --from=build --chown=app:app /repo/apps/web/.next/standalone ./
 COPY --from=build --chown=app:app /repo/apps/web/.next/static ./apps/web/.next/static

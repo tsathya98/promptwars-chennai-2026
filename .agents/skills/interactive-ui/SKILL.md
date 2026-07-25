@@ -38,10 +38,10 @@ Assembly recipe for the "Dribbble look" in ~1 hour: dark default → 2–3 gradi
 ## Technique catalog (all proven, cheapest first)
 
 ### 1. Cursor-reactive particle field (the template — zero deps)
-`starters/templates/components/cursor-field.tsx`, ported from agentic-central-reporting. Mechanics that make it feel organic: **lerped cursor follow** (`mouse += (target - mouse) * 0.12`), proximity-scaled dot brightness/size, particle↔particle + cursor↔particle connection lines, radial cursor halo, velocity damping + screen wrap. Density scales with viewport (`min(72, w*h/22000)`), DPR capped at 2. Drop behind login/hero: `<CursorField />` + content at `z-10`.
+Current implementation: `apps/web/components/cursor-field.tsx`, ported from agentic-central-reporting. Mechanics that make it feel organic: **lerped cursor follow** (`mouse += (target - mouse) * 0.12`), proximity-scaled dot brightness/size, particle↔particle + cursor↔particle connection lines, radial cursor halo, velocity damping + screen wrap. Density scales with viewport (`min(72, w*h/22000)`), DPR capped at 2. Drop behind login/hero: `<CursorField />` + content at `z-10`.
 
 ### 2. Cursor spotlight cards (pure CSS variables — the workhorse, use everywhere)
-Template: `starters/templates/components/spotlight-card.tsx` — wrap ANY card/tile/row.
+Current implementation: `apps/web/components/spotlight-card.tsx` — wrap any card, tile, or row.
 Track pointer per-element into CSS vars; paint a radial gradient at the cursor. GPU-cheap, no re-renders:
 ```tsx
 function onPointerMove(e: React.PointerEvent<HTMLDivElement>) {

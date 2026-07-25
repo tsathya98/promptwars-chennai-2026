@@ -1,6 +1,6 @@
 ---
 name: openai
-description: OpenAI API integration patterns for PromptWars Chennai 2026 — model (gpt-5.6-terra, low reasoning effort), the region-pinned base URL quirk, Responses API usage, fallback/retry, and MOCK mode. Use whenever creating, modifying, or reviewing OpenAI model calls or AI route handlers.
+description: OpenAI API integration patterns for PromptWars Chennai 2026 — model selection, the region-pinned base URL, Responses API structured output, retry, and honest fallback behavior. Use whenever creating, modifying, or reviewing OpenAI model calls or AI route handlers.
 ---
 
 # OpenAI API Integration (PromptWars Chennai 2026)
@@ -32,8 +32,7 @@ Both env vars live in `.env` / `.env.example`. If a call ever 40x's with
 
 ## 3. Core Implementation Pattern (`lib/openai.ts`)
 
-All direct OpenAI calls MUST flow through `lib/openai.ts`, mirroring the shape of
-`lib/gemini.ts`:
+All standard-response OpenAI calls MUST flow through `apps/web/lib/openai.ts`:
 ```ts
 import OpenAI from "openai";
 
@@ -52,10 +51,9 @@ export async function generate(input: string, opts: { effort?: "low" | "medium" 
   });
 }
 ```
-- Retry-once with 1s backoff on 429/503/500 — same policy as the Gemini ladder.
-- `MOCK=1` returns pre-baked JSON fixtures from `fixtures/`, same convention as
-  `lib/gemini.ts`, but only during local development. Throw immediately if
-  `MOCK=1` and `NODE_ENV=production`; never silently expose fixtures on a deployment.
+- Retry once with bounded backoff on 429/503/500.
+- The active wrapper has no mock mode. If a model call fails, show an honest
+  degraded state and use reviewed deterministic guidance only where available.
 - Response text lives at `response.output_text` (or walk `response.output[0].content[0].text`
   for the raw shape) — not `response.choices[0].message.content` (that's the older
   Chat Completions shape, not used here).
@@ -106,8 +104,8 @@ package. Don't hand-roll SSE parsing against the raw Responses API.
 
 ## 6. Smoke Testing
 
-Before wiring a route to this provider, verify the key + model + baseURL combo
-with a one-line ping (mirrors the `gemini` skill's `/api/health` check):
+Before wiring a route to this provider, verify the key, model, and base URL with
+a one-line ping equivalent to the application's `/api/health` check:
 ```ts
 await client.responses.create({ model: "gpt-5.6-terra", reasoning: { effort: "low" }, input: "ping" });
 ```
