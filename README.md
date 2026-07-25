@@ -8,7 +8,7 @@
 
 [![Live Demo](https://img.shields.io/badge/TRY_LIVE_DEMO-IBUKI_CIRCLE-14B8A6?style=for-the-badge)](https://web-delta-three-92.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.11-000000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
-[![Tests](https://img.shields.io/badge/Vitest-18_passing-6E9F18?style=for-the-badge&logo=vitest)](#engineering-evidence)
+[![Tests](https://img.shields.io/badge/Vitest-51_passing-6E9F18?style=for-the-badge&logo=vitest)](#engineering-evidence)
 [![Model Agnostic](https://img.shields.io/badge/Model_Agnostic-OpenAI_%7C_Gemini-7A77FF?style=for-the-badge)](#model-agnostic-by-design)
 [![Languages](https://img.shields.io/badge/Languages-8_Indian_languages-F5C84C?style=for-the-badge)](#multilingual-by-construction)
 
@@ -83,6 +83,59 @@ The page provides a one-tap **Fill** button and a **Continue as guest** option, 
 | Language adaptation | Choose Tamil, Hindi, Bengali, Telugu, Marathi, Kannada, or Malayalam, then tap or speak | The non-emergency plan is generated live in the selected language; speech input and read-aloud use the matching locale | Language preference → shared request schema → active model provider → localized widgets |
 | Education or resources | Ask for a helpline, treatment resource, or explanation | Plain-language guidance with resources selected only from the verified catalog | Resource Navigator → allow-listed resource IDs |
 
+## User journeys
+
+### One tap to a personalized plan
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant UI as Widget canvas
+    participant API as /api/intervene
+    participant Router as Safety router
+    participant Model as Active provider
+    participant Registry as Verified resources
+
+    User->>UI: Taps a command
+    UI->>API: POST request
+    API->>Router: Classify situation
+    alt Level 1 emergency
+        Note over Router,Registry: Emergencies skip the model entirely
+        Router->>Registry: Load verified protocol
+        Registry-->>API: 112 + reviewed steps
+    else Levels 2 and 3
+        Router->>Model: Specialist prompt
+        Model-->>API: Strict-schema intent
+        API->>API: Validate intent<br/>JSON Schema + Zod + allow-lists
+    end
+    API-->>UI: Stream activity events + validated widgets
+    UI-->>User: Support plan renders
+    User->>UI: Confirms a real action
+    UI-->>User: Opens call / SMS / share in own apps
+```
+
+### Live voice places help on screen
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Voice as IBUKI Voice WebRTC
+    participant Token as /api/realtime/token
+    participant Tools as Allow-listed screen tools
+    participant Canvas
+
+    User->>Voice: Opens Live voice
+    Voice->>Token: Request credential
+    Token-->>Voice: Short-lived token<br/>server-side key never leaves
+    Voice->>Voice: WebRTC session starts
+    User->>Voice: Speaks
+    Voice->>Tools: Tool call over data channel
+    Tools->>Tools: Zod-validate args<br/>refuse unknown names
+    Tools->>Canvas: Render widget
+    Canvas-->>User: Help appears on screen
+    Voice-->>User: Narrates what appeared
+```
+
 ## Direct alignment with all five functional pillars
 
 | Official challenge pillar | IBUKI Circle implementation | Evidence in the product |
@@ -107,7 +160,7 @@ The recovery workflow does not depend on one model vendor. `lib/model-provider.t
 
 | Capability | OpenAI adapter | Gemini adapter | Provider-independent boundary |
 |---|---|---|---|
-| Personalized intervention | Responses API using `gpt-5.6-terra` with low reasoning effort | `generateContent` using `gemini-3.6-flash` with low thinking | `generateIntent()` |
+| Personalized intervention | Responses API with low reasoning effort | `generateContent` with low thinking | `generateIntent()` |
 | Structured-output enforcement | Strict `json_schema` response format | `responseMimeType: application/json` plus `responseJsonSchema` | `MODEL_INTENT_JSON_SCHEMA` + `modelIntentSchema` |
 | Runtime validation | Zod after API-level validation | Zod after API-level validation | Deterministic widget compiler |
 | Failure handling | Automatic retry for selected transient errors, then optional Gemini fallback | Optional OpenAI fallback | Source-labelled verified guidance if no provider succeeds |
@@ -251,7 +304,7 @@ Every tap, speech-recognition transcript, and typed request uses the same compac
 ```json
 {"type":"activity","event":{"stage":"routing","status":"working","label":"Safety router assessing the situation"}}
 {"type":"activity","event":{"stage":"generation","status":"complete","label":"Recovery Coach plan generated"}}
-{"type":"response","response":{"agentId":"recovery-coach","riskLevel":"urgent","summary":"A short plan for this moment.","widgets":[{"type":"intervention-script","source":"ai","acknowledgement":"You did the right thing by reaching out.","steps":["Move to a different room."]},{"type":"safety-actions","source":"verified","resourceIds":["deaddiction-14446","telemanas-14416"],"note":"Free, confidential helplines."}],"generation":"mixed","model":"gemini-3.6-flash","language":"en"}}
+{"type":"response","response":{"agentId":"recovery-coach","riskLevel":"urgent","summary":"A short plan for this moment.","widgets":[{"type":"intervention-script","source":"ai","acknowledgement":"You did the right thing by reaching out.","steps":["Move to a different room."]},{"type":"safety-actions","source":"verified","resourceIds":["deaddiction-14446","telemanas-14416"],"note":"Free, confidential helplines."}],"generation":"mixed","model":"<active-provider-model>","language":"en"}}
 ```
 
 Activity frames report the real `routing`, `generation`, and `validation` stages; the client appends its real `rendering` stage when widgets mount. Connector controls report their own observable result beside the action. The final response contains the selected agent, risk level, generation provenance, actual model label or `null`, language, summary, and one to five validated widget specifications.
@@ -330,7 +383,7 @@ The interface is deliberately calm, high-contrast, and action-first:
 | **Problem alignment — high impact** | All five challenge pillars map to working evaluator flows: zero typing, personalized scripts, contextual safety, caregiver/education support, and connected multimodal actions |
 | **Security — medium impact** | Server-only long-lived keys, short-lived Realtime credentials, minimal `HttpOnly` demo session, no sensitive database, no response cache, explicit consent, safe connector states, security headers, production dependency audit, and Gitleaks |
 | **Efficiency — medium impact** | One structured generation call for non-emergencies, low reasoning/thinking modes, streamed activity, provider failover without a second orchestration path, static page shell, and zero model latency on Level 1 |
-| **Testing — tie-breaker** | 18 focused unit tests cover request and response schemas, safety routing, emergency independence, deterministic compilation, verified fallback behavior, resource rejection, and connector URL construction |
+| **Testing — tie-breaker** | 51 focused unit tests cover API route handlers, provider selection, request and response schemas, safety routing, emergency independence, deterministic compilation, verified fallback behavior, resource rejection, and connector URL construction |
 | **Accessibility — tie-breaker** | Keyboard focus, semantic controls, 48 px or larger primary targets, live status announcements, reduced-motion support, provider-neutral source labels, and simplified emergency presentation |
 
 ## GenAI and technology stack
@@ -358,12 +411,12 @@ Verified locally against the current implementation:
 
 | Check | Current result | What it covers |
 |---|---|---|
-| `pnpm nx test web` | **18 tests passing across 4 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
-| `pnpm nx lint web` | **0 errors** | Next.js, React, TypeScript, hooks, and accessibility linting; two non-blocking cursor-animation warnings remain |
+| `pnpm nx test web` | **51 tests passing across 11 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
+| `pnpm nx lint web` | **0 errors, 0 warnings** | Next.js, React, TypeScript, hooks, and accessibility linting |
 | `pnpm nx build web` | **Passing production build** | Next.js 16 compilation, TypeScript checking, static generation, and all application/API routes |
 | `pnpm audit --prod --audit-level=high` | **No known vulnerabilities found** | Production dependency audit |
 | Deployed smoke check | **Passing** | `/` redirects to `/login`; demo login and guest entry return 200 with secure session cookies; `/api/health` returns `{ "ok": true }` |
-| Repository size | **Approximately 1.5 MiB of local Git metadata** | Comfortably below the challenge’s 10 MB repository limit |
+| Repository size | **Under 2 MiB of local Git metadata** | Comfortably below the challenge’s 10 MB repository limit |
 | GitHub Actions | **Configured** | Frozen install, guidance mirror check, lint, test, production audit, build, concurrency cancellation, and secret scan |
 
 The production application exposes:

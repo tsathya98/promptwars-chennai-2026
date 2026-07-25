@@ -37,8 +37,10 @@ jobs:
           cmp -s CLAUDE.md AGENTS.md
       - name: Lint
         run: pnpm nx lint web
-      - name: Test
-        run: pnpm nx test web
+      - name: Test with coverage
+        run: |
+          pnpm --filter @promptwars/web exec vitest run --coverage.enabled --coverage.reporter=text-summary --coverage.reporter=text 2>&1 | tee /tmp/vitest.log
+          { echo '### Test coverage'; echo '```'; grep -A 10 "Coverage report" /tmp/vitest.log | head -12; echo '```'; } >> "$GITHUB_STEP_SUMMARY" || true
       - name: Audit production dependencies
         run: pnpm audit --prod --audit-level=high
       - name: Build

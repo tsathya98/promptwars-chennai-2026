@@ -6,7 +6,9 @@ the deployed recovery and prevention web application.
 ## Active layout
 
 - `apps/web` — Next.js 16 App Router, React 19, Tailwind CSS 4, and Vitest.
-- `apps/web/lib/openai.ts` — the only standard-response provider wrapper.
+- `apps/web/lib/model-provider.ts` — model-agnostic generation layer
+  (`MODEL_PROVIDER=openai|gemini`, automatic cross-provider fallback) over the
+  `lib/openai.ts` and `lib/gemini.ts` wrappers.
 - `apps/web/lib/agents/` — specialist registry and intervention orchestrator.
 - `apps/web/lib/{schemas,safety-router,resources,connectors}.ts` — typed safety,
   resource, widget, and browser-action boundaries.
@@ -31,10 +33,12 @@ Use pnpm for JavaScript dependencies; never npm or yarn. Nx details are in
 1. **Protect the safety boundary.** Level 1 emergency routing and verified resources
    must never depend on a model. Model output remains schema-validated intent;
    deterministic code owns widgets, resources, and connectors.
-2. **Use the active provider path.** The submission uses OpenAI
-   `gpt-5.6-terra` through `lib/openai.ts` and `gpt-realtime` for live voice.
-   The key is region-pinned to `https://us.api.openai.com/v1`. Smoke-test a model
-   against that host before adding its ID.
+2. **Use the provider layer, never a vendor SDK directly.** All structured
+   generation goes through `lib/model-provider.ts` (OpenAI `gpt-5.6-terra`
+   default, Gemini `gemini-3.6-flash` option, automatic fallback);
+   `gpt-realtime` powers live voice and `gpt-4o-mini-tts` read-aloud. The
+   OpenAI key is region-pinned to `https://us.api.openai.com/v1`. Smoke-test
+   any model ID against its real host before adding it to code.
 3. **Use repository skills deliberately.** Apply `rapid-mvp` to feature scope,
    `openai` to model/API work, `interactive-ui` to user-facing UI, and
    `demo-polish` during final hardening.

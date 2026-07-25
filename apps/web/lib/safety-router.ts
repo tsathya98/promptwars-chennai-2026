@@ -6,9 +6,13 @@ import type { AgentId, RiskLevel } from "./schemas";
  * to the verified protocol. The model can personalize wording afterwards but
  * can never lower a safety level.
  */
+/** 1 = immediate danger (no model), 2 = urgent support, 3 = ongoing support. */
 export type SafetyLevel = 1 | 2 | 3;
+
+/** Who is asking: the person themselves, or someone supporting them. */
 export type ActorMode = "individual" | "caregiver";
 
+/** One zero-typing command: its label, safety level, and owning specialist. */
 export type CommandButton = {
   id: string;
   mode: ActorMode;
@@ -19,6 +23,7 @@ export type CommandButton = {
   agentId: AgentId;
 };
 
+/** The twelve one-tap commands (six per mode) — the primary zero-typing surface. */
 export const COMMAND_BUTTONS: readonly CommandButton[] = [
   // Individual mode
   {
@@ -208,8 +213,10 @@ const EDUCATION_HINTS: readonly string[] = [
   "naloxone",
 ] as const;
 
+/** Router input: the actor mode plus a command id and/or free text. */
 export type RouteInput = { mode: ActorMode; buttonId?: string; text?: string };
 
+/** Deterministic routing decision consumed by the orchestrator. */
 export type RouteResult = {
   level: SafetyLevel;
   riskLevel: RiskLevel;
@@ -218,14 +225,20 @@ export type RouteResult = {
   matchedPhrase?: string;
 };
 
+/** Returns the matched emergency phrase (word-boundary match) or null. */
 export function containsEmergencyPhrase(text: string): string | null {
   return EMERGENCY_MATCHERS.find((m) => m.re.test(text))?.phrase ?? null;
 }
 
+/** Looks up a command button, enforcing that it belongs to the actor's mode. */
 export function getButton(mode: ActorMode, buttonId: string): CommandButton | undefined {
   return COMMAND_BUTTONS.find((b) => b.id === buttonId && b.mode === mode);
 }
 
+/**
+ * Classifies a request into a safety level and specialist. Emergency signals
+ * (buttons or phrases) always win; the model can never lower the result.
+ */
 export function route(input: RouteInput): RouteResult {
   if (input.buttonId) {
     const btn = getButton(input.mode, input.buttonId);

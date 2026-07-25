@@ -8,6 +8,7 @@ import type {
   InterveneRequestInput,
 } from "./schemas";
 
+/** Lifecycle of one intervention request as seen by the UI. */
 export type InterveneStatus = "idle" | "working" | "done" | "error";
 
 function upsert(events: ActivityEvent[], event: ActivityEvent): ActivityEvent[] {

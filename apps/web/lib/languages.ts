@@ -6,8 +6,10 @@
  * would be dishonest.
  */
 export const LANGUAGE_CODES = ["en", "ta", "hi", "bn", "te", "mr", "kn", "ml"] as const;
+/** Two-letter code of a supported response language. */
 export type LanguageCode = (typeof LANGUAGE_CODES)[number];
 
+/** Per-language display label (native script), English name (for prompts), and speech locale. */
 export const LANGUAGES: Record<
   LanguageCode,
   { label: string; name: string; speech: string }

@@ -15,18 +15,23 @@ export type ConnectorResult = {
 
 /* ---------- Pure link builders (unit-tested, no browser APIs) ---------- */
 
+/** Builds a `tel:` link, stripping everything except digits and `+`. */
 export const buildTelLink = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 
+/** Builds an `sms:` composer link with the body URL-encoded. */
 export const buildSmsLink = (body: string) => `sms:?&body=${encodeURIComponent(body)}`;
 
+/** Builds a WhatsApp share link with the message URL-encoded. */
 export const buildWhatsAppLink = (body: string) =>
   `https://wa.me/?text=${encodeURIComponent(body)}`;
 
+/** Builds a Google Maps link from coordinates rounded to ~1m precision. */
 export const buildMapsLink = (lat: number, lng: number) =>
   `https://maps.google.com/?q=${lat.toFixed(5)},${lng.toFixed(5)}`;
 
 /* ---------- Browser connectors ---------- */
 
+/** Opens the device dialler with the number prefilled; the call stays in the user's hands. */
 export function openPhone(phone: string, label?: string): ConnectorResult {
   window.location.href = buildTelLink(phone);
   return {
@@ -36,16 +41,19 @@ export function openPhone(phone: string, label?: string): ConnectorResult {
   };
 }
 
+/** Opens the SMS composer with the message prefilled for the user to review and send. */
 export function openSms(body: string): ConnectorResult {
   window.location.href = buildSmsLink(body);
   return { status: "opened", message: "SMS composer opened — review and send.", retryable: true };
 }
 
+/** Opens WhatsApp with the message prefilled; sending remains the user's action. */
 export function openWhatsApp(body: string): ConnectorResult {
   window.open(buildWhatsAppLink(body), "_blank", "noopener,noreferrer");
   return { status: "opened", message: "WhatsApp opened — review and send.", retryable: true };
 }
 
+/** Opens the native share sheet; falls back to copying when Web Share is unavailable. */
 export async function shareText(text: string): Promise<ConnectorResult> {
   try {
     if (typeof navigator.share === "function") {
@@ -61,6 +69,7 @@ export async function shareText(text: string): Promise<ConnectorResult> {
   }
 }
 
+/** Copies the message to the clipboard, reporting an honest "prepared" state. */
 export async function copyText(text: string): Promise<ConnectorResult> {
   try {
     await navigator.clipboard.writeText(text);
@@ -158,6 +167,7 @@ function speakWithBrowser(
   return { status: "opened", message: "Reading aloud.", retryable: true };
 }
 
+/** Stops any active read-aloud (server audio and browser speech) and releases resources. */
 export function stopSpeaking() {
   if (activeAudio) {
     activeAudio.onended = null;

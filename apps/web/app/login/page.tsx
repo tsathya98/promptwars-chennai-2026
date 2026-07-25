@@ -36,8 +36,8 @@ export default function LoginPage() {
 
   return (
     <main id="main" className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
-      <div aria-hidden className="orb absolute -top-32 right-[-100px]" />
-      <div aria-hidden className="orb orb-violet absolute bottom-[-160px] left-[-120px]" />
+      <div aria-hidden className="orb fixed -top-32 right-[-100px]" />
+      <div aria-hidden className="orb orb-violet fixed bottom-[-160px] left-[-120px]" />
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-6 text-center">

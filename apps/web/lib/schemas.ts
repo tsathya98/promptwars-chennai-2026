@@ -6,6 +6,7 @@ import { LANGUAGE_CODES } from "./languages";
  * Closed vocabularies — agents select from validated IDs; deterministic
  * application code performs every real-world action.
  */
+/** The four specialist agents; requests route to exactly one. */
 export const AGENT_IDS = [
   "safety-guardian",
   "recovery-coach",
@@ -13,6 +14,7 @@ export const AGENT_IDS = [
   "resource-navigator",
 ] as const;
 
+/** Real-world action capabilities a specialist may offer (deterministic code executes them). */
 export const CONNECTOR_IDS = [
   "phone",
   "circle-message",
@@ -21,10 +23,14 @@ export const CONNECTOR_IDS = [
   "native-share",
 ] as const;
 
+/** Risk ladder: steady/elevated = support, urgent = time-sensitive, emergency = Level 1. */
 export const RISK_LEVELS = ["steady", "elevated", "urgent", "emergency"] as const;
 
+/** Identifier of one of the four specialist agents. */
 export type AgentId = (typeof AGENT_IDS)[number];
+/** Identifier of an allow-listed connector capability. */
 export type ConnectorId = (typeof CONNECTOR_IDS)[number];
+/** Assessed risk level of a request/response. */
 export type RiskLevel = (typeof RISK_LEVELS)[number];
 
 /** Who authored a widget's content: a live model call, or the reviewed protocol registry. */
@@ -33,6 +39,11 @@ export type ContentSource = z.infer<typeof contentSourceSchema>;
 
 const shortSteps = z.array(z.string().min(1)).min(1).max(3);
 
+/**
+ * The closed widget vocabulary. Every card the app can render is one of
+ * these six shapes; anything else is rejected at validation time and would
+ * surface as a visible error block if it ever reached the renderer.
+ */
 export const widgetSpecSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("intervention-script"),
@@ -75,9 +86,15 @@ export const widgetSpecSchema = z.discriminatedUnion("type", [
     note: z.string().max(200).nullable(),
   }),
 ]);
+/** A validated widget ready for deterministic rendering. */
 export type WidgetSpec = z.infer<typeof widgetSpecSchema>;
+/** Discriminant of the closed widget vocabulary. */
 export type WidgetType = WidgetSpec["type"];
 
+/**
+ * One real pipeline stage streamed to the activity rail (routing/generation/
+ * validation/rendering) — actual work, never fabricated reasoning theater.
+ */
 export const activityEventSchema = z.object({
   id: z.string(),
   stage: z.enum(["routing", "generation", "validation", "rendering", "connector"]),
@@ -89,6 +106,7 @@ export const activityEventSchema = z.object({
 });
 export type ActivityEvent = z.infer<typeof activityEventSchema>;
 
+/** The final validated intervention: specialist, risk, widgets, provenance. */
 export const agentResponseSchema = z.object({
   agentId: z.enum(AGENT_IDS),
   riskLevel: z.enum(RISK_LEVELS),
@@ -108,6 +126,7 @@ export type InterveneFrame =
   | { type: "response"; response: AgentResponse }
   | { type: "error"; message: string };
 
+/** Optional situation context — all fields optional, all one-tap on the client. */
 export const interveneContextSchema = z.object({
   alone: z.boolean().optional(),
   setting: z.enum(["home", "outside", "work", "social", "driving"]).optional(),
@@ -117,6 +136,7 @@ export const interveneContextSchema = z.object({
 });
 export type InterveneContext = z.infer<typeof interveneContextSchema>;
 
+/** Request contract for POST /api/intervene — shared by tap, voice, and text. */
 export const interveneRequestSchema = z
   .object({
     mode: z.enum(["individual", "caregiver"]),

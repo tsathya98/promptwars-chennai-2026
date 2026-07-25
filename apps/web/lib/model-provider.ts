@@ -9,11 +9,13 @@ import { generate as openaiGenerate, generateStructured as openaiGenerateStructu
  * is the automatic fallback when the primary errors. Both run the same
  * strict-schema + zod contract, so the rest of the app is provider-blind.
  */
+/** The two verified structured-generation providers. */
 export type ProviderName = "openai" | "gemini";
 
 const openaiAvailable = () =>
   Boolean(process.env.OPENAI_API_KEY || process.env.OPEN_AI_API_KEY);
 
+/** Primary provider from MODEL_PROVIDER (defaults to OpenAI when unset/unavailable). */
 export function activeProvider(): ProviderName {
   return process.env.MODEL_PROVIDER === "gemini" && geminiAvailable() ? "gemini" : "openai";
 }
@@ -27,11 +29,13 @@ const available: Record<ProviderName, () => boolean> = {
   gemini: geminiAvailable,
 };
 
+/** Verified model id used by each provider. */
 export const PROVIDER_MODELS: Record<ProviderName, string> = {
   openai: OPENAI_MODELS.main,
   gemini: GEMINI_MODELS.main,
 };
 
+/** Arguments shared by both providers' structured-generation calls. */
 export type StructuredArgs<T> = {
   schema: ZodType<T>;
   jsonSchema: Record<string, unknown>;
@@ -40,6 +44,7 @@ export type StructuredArgs<T> = {
   input: string;
 };
 
+/** A validated intent plus the provider/model that actually produced it. */
 export type StructuredResult<T> = { value: T; provider: ProviderName; model: string };
 
 /** Structured intent generation with automatic cross-provider fallback. */
