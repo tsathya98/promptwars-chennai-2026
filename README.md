@@ -8,7 +8,7 @@
 
 [![Live Demo](https://img.shields.io/badge/TRY_LIVE_DEMO-IBUKI_CIRCLE-14B8A6?style=for-the-badge)](https://web-delta-three-92.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.11-000000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
-[![Tests](https://img.shields.io/badge/Vitest-51_passing-6E9F18?style=for-the-badge&logo=vitest)](#engineering-evidence)
+[![Tests](https://img.shields.io/badge/Vitest-65_passing-6E9F18?style=for-the-badge&logo=vitest)](#engineering-evidence)
 [![Model Agnostic](https://img.shields.io/badge/Model_Agnostic-OpenAI_%7C_Gemini-7A77FF?style=for-the-badge)](#model-agnostic-by-design)
 [![Languages](https://img.shields.io/badge/Languages-8_Indian_languages-F5C84C?style=for-the-badge)](#multilingual-by-construction)
 
@@ -383,7 +383,7 @@ The interface is deliberately calm, high-contrast, and action-first:
 | **Problem alignment — high impact** | All five challenge pillars map to working evaluator flows: zero typing, personalized scripts, contextual safety, caregiver/education support, and connected multimodal actions |
 | **Security — medium impact** | Server-only long-lived keys, short-lived Realtime credentials, minimal `HttpOnly` demo session, no sensitive database, no response cache, explicit consent, safe connector states, security headers, production dependency audit, and Gitleaks |
 | **Efficiency — medium impact** | One structured generation call for non-emergencies, low reasoning/thinking modes, streamed activity, provider failover without a second orchestration path, static page shell, and zero model latency on Level 1 |
-| **Testing — tie-breaker** | 51 focused unit tests cover API route handlers, provider selection, request and response schemas, safety routing, emergency independence, deterministic compilation, verified fallback behavior, resource rejection, and connector URL construction |
+| **Testing — tie-breaker** | 65 focused unit tests cover API route handlers, provider selection, request and response schemas, safety routing, emergency independence, deterministic compilation, verified fallback behavior, resource rejection, and connector URL construction |
 | **Accessibility — tie-breaker** | Keyboard focus, semantic controls, 48 px or larger primary targets, live status announcements, reduced-motion support, provider-neutral source labels, and simplified emergency presentation |
 
 ## GenAI and technology stack
@@ -411,7 +411,7 @@ Verified locally against the current implementation:
 
 | Check | Current result | What it covers |
 |---|---|---|
-| `pnpm nx test web` | **51 tests passing across 11 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
+| `pnpm nx test web` | **65 tests passing across 14 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
 | `pnpm nx lint web` | **0 errors, 0 warnings** | Next.js, React, TypeScript, hooks, and accessibility linting |
 | `pnpm nx build web` | **Passing production build** | Next.js 16 compilation, TypeScript checking, static generation, and all application/API routes |
 | `pnpm audit --prod --audit-level=high` | **No known vulnerabilities found** | Production dependency audit |
