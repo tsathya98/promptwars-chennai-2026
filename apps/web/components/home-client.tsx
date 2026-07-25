@@ -101,6 +101,11 @@ export default function Home() {
   const [liveVoiceOpen, setLiveVoiceOpen] = useState(false);
   const [language, setLanguage] = useState<LanguageCode>("en");
   const [voiceWidgets, setVoiceWidgets] = useState<WidgetSpec[]>([]);
+  const [alone, setAlone] = useState<boolean | undefined>(undefined);
+  const [setting, setSetting] = useState<
+    "home" | "outside" | "work" | "social" | "driving" | undefined
+  >(undefined);
+  const emergencyCallRef = useRef<HTMLAnchorElement | null>(null);
   const { events, response, status, error, intervene, reset } = useIntervene();
   const lastRequest = useRef<InterveneRequestInput | null>(null);
 
@@ -119,10 +124,24 @@ export default function Home() {
   const buttons = useMemo(() => COMMAND_BUTTONS.filter((b) => b.mode === mode), [mode]);
   const agent = response ? AGENTS[response.agentId] : null;
 
+  // In crisis mode, keyboard focus lands directly on the Call 112 action.
+  useEffect(() => {
+    if (crisis) emergencyCallRef.current?.focus();
+  }, [crisis]);
+
+  // Situation-aware context (alone / setting) personalizes every generation.
   const run = (request: InterveneRequestInput) => {
-    const withLanguage = { ...request, language };
-    lastRequest.current = withLanguage;
-    void intervene(withLanguage);
+    const withContext = {
+      ...request,
+      language,
+      context: {
+        ...(alone !== undefined && { alone }),
+        ...(setting && { setting }),
+        ...request.context,
+      },
+    };
+    lastRequest.current = withContext;
+    void intervene(withContext);
   };
 
   const spot = (e: ReactPointerEvent<HTMLButtonElement>) => {
@@ -153,7 +172,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden">
+    <main id="main" className="relative min-h-screen overflow-x-hidden">
       {!crisis && <CursorField />}
       {!crisis && (
         <>
@@ -223,8 +242,9 @@ export default function Home() {
               </span>
             </div>
             <a
+              ref={emergencyCallRef}
               href={buildTelLink("112")}
-              className="flex min-h-16 items-center justify-center gap-3 rounded-2xl bg-[var(--crisis)] text-xl font-extrabold text-white transition-colors hover:bg-[#a10f35]"
+              className="flex min-h-16 items-center justify-center gap-3 rounded-2xl bg-[var(--crisis)] text-xl font-extrabold text-white transition-colors hover:bg-[#c73a44]"
             >
               <PhoneCall className="h-6 w-6" aria-hidden />
               Call 112 now
@@ -317,6 +337,47 @@ export default function Home() {
                 })}
               </div>
             </section>
+
+            {/* Optional situation context — personalizes every generation */}
+            <div className="flex flex-wrap items-center gap-2" aria-label="Optional situation context">
+              <span className="kicker">[ Right now ]</span>
+              {(
+                [
+                  { label: "I'm alone", active: alone === true, toggle: () => setAlone(alone === true ? undefined : true) },
+                  { label: "With someone", active: alone === false, toggle: () => setAlone(alone === false ? undefined : false) },
+                ] as const
+              ).map((chip) => (
+                <button
+                  key={chip.label}
+                  type="button"
+                  onClick={chip.toggle}
+                  aria-pressed={chip.active}
+                  className={`min-h-9 rounded-full border px-3 text-xs font-semibold transition-colors ${
+                    chip.active
+                      ? "border-[var(--indigo)]/60 bg-[var(--indigo)]/15 text-[var(--indigo)]"
+                      : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)]"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+              <span aria-hidden className="h-4 w-px bg-[var(--line)]" />
+              {(["home", "outside", "work", "social", "driving"] as const).map((place) => (
+                <button
+                  key={place}
+                  type="button"
+                  onClick={() => setSetting(setting === place ? undefined : place)}
+                  aria-pressed={setting === place}
+                  className={`min-h-9 rounded-full border px-3 text-xs font-semibold capitalize transition-colors ${
+                    setting === place
+                      ? "border-[var(--teal)]/60 bg-[var(--teal)]/12 text-[var(--teal)]"
+                      : "border-[var(--line)] text-[var(--text-soft)] hover:border-[var(--line-hi)]"
+                  }`}
+                >
+                  {place}
+                </button>
+              ))}
+            </div>
 
             {/* Voice + text — same pipeline as the buttons */}
             <form

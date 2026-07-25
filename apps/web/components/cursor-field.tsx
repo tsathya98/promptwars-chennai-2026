@@ -33,8 +33,9 @@ export function CursorField({
     const lineMaxA = light ? 0.38 : 0.18;
     const cursorMaxA = light ? 0.8 : 0.55;
 
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
     let raf = 0;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const mouse = { x: -9999, y: -9999, on: false };

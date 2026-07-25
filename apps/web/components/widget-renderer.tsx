@@ -424,7 +424,7 @@ export function WidgetCanvas({ response }: { response: AgentResponse }) {
   const emergency = response.riskLevel === "emergency";
   const speechLang = LANGUAGES[response.language]?.speech ?? "en-IN";
   return (
-    <div className="grid gap-4 md:grid-cols-2">
+    <div className="grid gap-4 md:grid-cols-2" lang={response.language}>
       {response.widgets.map((spec, i) => (
         <div
           key={`${spec.type}-${i}`}
