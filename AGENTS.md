@@ -18,15 +18,21 @@ night before. The repo gets renamed once the problem statement is known.
 
 ## Ground rules
 
-1. **Submission code uses Google models only**: `gemini-3.6-flash` (main) and
-   `gemini-3.5-flash-lite` (fast/fallback). Never invent model IDs. **Provider
-   priority: Antigravity subscription (`agy -p`, local non-interactive) first, API key
-   second** — routing in `docs/05-antigravity-programmatic.md`; streaming/deployed
-   paths are API-key only. `ThinkingLevel` is an enum from `@google/genai`, not a string.
+1. **No vendor restriction — any model, any provider**. The "Google models only"
+   rule from event night is lifted; pick whatever fits the problem statement. Still
+   never invent model IDs — verify a model string is real before writing it into
+   code. Known-good lanes so far: Gemini (`gemini-3.6-flash` main / `gemini-3.5-flash-lite`
+   fast, via `lib/gemini.ts` / `gemini` skill; Antigravity subscription routing in
+   `docs/05-antigravity-programmatic.md`, now optional narrative flavor rather than
+   required) and OpenAI (`gpt-5.6-terra`, low reasoning effort, via `lib/openai.ts` /
+   `openai` skill — note its key is region-pinned to `https://us.api.openai.com/v1`,
+   the default host 404s with `incorrect_hostname`). `ThinkingLevel` is an enum from
+   `@google/genai`, not a string — still applies wherever Gemini is used.
 2. **Demo-first, never half-baked**: `rapid-mvp` skill for all feature work, `gemini`
-   skill for model calls, `antigravity` skill for agy usage, `interactive-ui` skill for
-   all user-facing UI (cursor-reactive design language), `google-auth` if login is
-   needed, `demo-polish` in the final hour.
+   skill for Gemini model calls, `openai` skill for OpenAI model calls, `antigravity`
+   skill for agy usage (optional), `interactive-ui` skill for all user-facing UI
+   (cursor-reactive design language), `google-auth` if login is needed, `demo-polish`
+   in the final hour.
 3. **README.md is the jury-facing template** — fill its `{{...}}` placeholders in the
    first hour, keep it current, never leave a placeholder at freeze. Kit/prep
    instructions live in KIT.md.

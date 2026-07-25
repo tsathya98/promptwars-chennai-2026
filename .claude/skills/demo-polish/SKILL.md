@@ -10,7 +10,7 @@ When feature freeze is called (or at 4:00 PM), immediately halt new feature deve
 ## Step 1: Error-Proof All Visible User Paths
 
 1. **Graceful Error Boundaries**: Wrap every Gemini call and API route in a try-catch block that renders a styled, friendly UI message on failure (never show unhandled stack traces, raw error JSON, or red Next.js dev overlays).
-2. **Fallback Ladder Verification**: Test the fallback ladder (`gemini-3.6-flash` → `gemini-3.5-flash-lite` → `GEMINI_API_KEY_FALLBACK`) locally by temporarily invalidating the primary key.
+2. **Fallback Ladder Verification**: Test whichever fallback ladder the app actually uses locally by temporarily invalidating the primary key — e.g. `gemini-3.6-flash` → `gemini-3.5-flash-lite` → `GEMINI_API_KEY_FALLBACK` on the Gemini lane, or the equivalent retry-once-with-backoff in `lib/openai.ts` on the OpenAI lane.
 3. **Empty State Guards**: Ensure every table, chart, list, and card component handles empty or null data gracefully without crashing or breaking layout.
 4. **Console Hygiene**: Clear out all dev console errors, warnings, and unhandled rejections on the **deployed Vercel URL** (test on actual deployment, not localhost).
 
@@ -29,7 +29,7 @@ When feature freeze is called (or at 4:00 PM), immediately halt new feature deve
      - *Beat 1*: Action taken → UI outcome → Why it matters.
      - *Beat 2*: Action taken → UI outcome → Why it matters.
      - *Beat 3*: Action taken → UI outcome → Why it matters.
-   - **Google Tech Stack Bullet Points**: Name-check **Gemini 3.6 Flash**, **Gemini 3.5 Flash-Lite**, **Google Search Grounding**, **Structured Outputs**, **Vercel AI SDK**, and **Antigravity**.
+   - **Tech Stack Bullet Points**: Name-check whichever models/providers actually power the app (e.g. **Gemini 3.6 Flash** + **Google Search Grounding** + **Antigravity**, or **GPT-5.6 Terra**, or a mix), plus **Structured Outputs** and **Vercel AI SDK** — no vendor is mandatory to mention, just be accurate about what's actually running.
    - **Next Steps & Contact**: One concluding line.
 3. **Generate QR Code**:
    - Generate `public/qr.png` pointing to the live deployed Vercel URL using `pnpm dlx qrcode <DEPLOYED_URL> -o public/qr.png`.

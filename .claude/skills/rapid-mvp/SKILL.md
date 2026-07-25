@@ -35,7 +35,9 @@ A feature is NOT done until ALL of these hold. If time runs short, drop the next
 
 - **DO NOT BUILD**: Custom authentication or user accounts (exception: if the problem demands identity or a login adds demo value, use the `google-auth` skill — Auth.js v5 + Google, ~20 min, guest-mode fallback mandatory), database setup (Postgres/DynamoDB), settings screens, multi-tenancy, i18n, micro-frontends, or heavy testing suites.
 - **MUST BUILD**:
-  - `GET /api/health` route pinging `gemini-3.5-flash-lite`.
+  - `GET /api/health` route pinging whichever model actually powers the app (no
+    vendor restriction — `gemini-3.5-flash-lite` and `gpt-5.6-terra` low-effort are
+    both cheap enough for a health ping; see `gemini`/`openai` skills).
   - Loading skeleton states for generative UI.
   - Friendly error boundaries (no raw JSON/red overlays).
   - One-click "Try Example" chips pre-loaded with optimal demo queries.

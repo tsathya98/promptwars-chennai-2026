@@ -5,6 +5,10 @@ description: Gemini API integration patterns for PromptWars Chennai 2026 — mod
 
 # Gemini API Integration (PromptWars Chennai 2026)
 
+> **Provider note**: the event's original "Google models only" rule has been lifted —
+> any vendor is now allowed. This skill still applies whenever Gemini is the model
+> in use for a given call; see the `openai` skill for the other supported lane.
+
 ## 1. Verified Model Lineup (July 2026)
 
 - **`gemini-3.6-flash`**: Main workhorse for chat, structured outputs, agentic tools, multimodal intake, and interactive UI generation.

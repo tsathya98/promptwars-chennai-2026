@@ -15,7 +15,7 @@ IndiQube Millenia). Problem statement drops at the venue; this kit makes the fir
 | `docs/05-antigravity-programmatic.md` | **Subscription-first model access** — `agy -p` wrapper templates, routing rules, verified locally |
 | `prompts/kickoff-prompts.md` | Copy-paste prompts: triage → scaffold → iterate → freeze → emergency |
 | `prompts/system-prompts.md` | System-prompt templates for the app itself |
-| `.claude/skills/` | Auto-loaded Claude Code skills: `rapid-mvp`, `gemini`, `antigravity`, `google-auth`, `interactive-ui`, `demo-polish` (mirrored to `.agents/skills/` for Antigravity) |
+| `.claude/skills/` | Auto-loaded Claude Code skills: `rapid-mvp`, `gemini`, `openai`, `antigravity`, `google-auth`, `interactive-ui`, `demo-polish` (mirrored to `.agents/skills/` for Antigravity) |
 | `starters/` | `setup.sh` scaffold + golden templates (gemini wrapper, widget renderer, routes) |
 
 ## Tonight (do these, ~30 min)

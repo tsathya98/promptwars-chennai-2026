@@ -1,6 +1,12 @@
 # Google Stack Reference (verified 24 July 2026)
 
-The submission must visibly run on Google AI. Two sanctioned paths: **Gemini API key** (AI Studio) or **Antigravity** login. Use the API key for the product; use Antigravity for narrative/tooling credibility.
+> **Update (day-of)**: the "must visibly run on Google AI" constraint below is
+> lifted — any vendor/model is now allowed. Everything in this doc remains
+> accurate as a reference for the Gemini/Antigravity lane specifically; it's an
+> option, not a requirement. See the `openai` skill / `lib/openai.ts` for the
+> other currently-wired lane (`gpt-5.6-terra`).
+
+Two paths for the Gemini lane: **Gemini API key** (AI Studio) or **Antigravity** login. Use the API key for the product; use Antigravity for narrative/tooling credibility if you choose to showcase it.
 
 ## Models — current lineup (GA July 21, 2026)
 

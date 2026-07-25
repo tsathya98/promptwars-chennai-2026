@@ -1,5 +1,10 @@
 # Programmatic Google-Model Access via Antigravity Subscription
 
+> **Update (day-of)**: no vendor restriction anymore — using this Antigravity lane
+> is now a choice, not a submission requirement. It's still the cheapest path for
+> local non-interactive batch generation, so the routing guidance below stands on
+> its own merits.
+
 **Priority order: subscription first, API key second** — but they serve different
 physical situations, so this is a routing decision, not a preference toggle.
 

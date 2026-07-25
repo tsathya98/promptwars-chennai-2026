@@ -2,6 +2,11 @@
 
 Decided in advance so zero time is spent on stack debates at the venue. Informed by the four Takeda repo deep-dives (see `04-takeda-patterns.md`) translated to the Google stack.
 
+> **Update (day-of)**: no vendor restriction on the model layer anymore — the rows
+> below describe the Gemini lane specifically (still fully valid); an OpenAI lane
+> (`gpt-5.6-terra` via `lib/openai.ts` / `openai` skill) is also wired and available.
+> Everything else here (Nx, Next.js, Tailwind, Recharts, deploy) is unaffected.
+
 ## The stack (default for almost any problem statement)
 
 | Layer | Choice | Why |

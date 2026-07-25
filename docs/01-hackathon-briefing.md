@@ -18,7 +18,9 @@
 
 - [ ] **Gemini API key**: create/verify at [Google AI Studio](https://aistudio.google.com) → export as `GEMINI_API_KEY` in `~/.zshrc`. Create a **second key on a second Google account** as a quota fallback.
 - [ ] **Antigravity**: run `agy` in a real terminal, confirm login works (`agy auth status` needs a TTY). Desktop app installed and signed in too, if you plan to use it. **Do NOT burn quota tonight** — quota is shared across Antigravity desktop + CLI + SDK and resets on a rolling window; the invite explicitly says to reserve tokens for event day.
-- [ ] **Claude Code** signed in (your dev copilot; submission code still targets Google models).
+- [ ] **Claude Code** signed in (your dev copilot; submission code has no vendor
+      restriction as of day-of — any model/provider is allowed, see `docs/02` and
+      the `openai` skill for the currently-wired second lane).
 - [ ] Node 22 ✓ (v22.23.0), pnpm ✓ (10.33), Python 3.14 ✓, uv ✓ (0.11) — already verified. **pnpm for all JS, uv for all Python — never npm/pip** (matches takOS + agentic-central-reporting conventions).
 - [ ] `pnpm dlx create-next-app@latest --help` runs once tonight so the package is in pnpm store (offline-resilience).
 - [ ] Pre-cache heavy npm deps (run the starter scaffold in `starters/` once tonight, keep `node_modules` or at least the pnpm store warm).
@@ -28,6 +30,12 @@
 - [ ] Phone charged; carry a USB cable (demo from phone via QR code to deployed URL impresses judges).
 
 ## Quota strategy (critical — this decides your day)
+
+> **Update (day-of)**: the "Google models only" submission rule is lifted — any
+> vendor/model is fair game. The Gemini-specific guidance below still applies
+> wherever Gemini is the model actually in use; treat it as one supported lane,
+> not the only one. See `docs/02-google-stack.md`'s note and the `openai` skill
+> for the other currently-wired lane (`gpt-5.6-terra`).
 
 1. **Two lanes, two quotas:** Use **Claude Code for building** (your own quota) and spend **Gemini quota only on the product runtime** (the app's API calls). Never let your dev tooling and your demo compete for the same tokens.
 2. Antigravity CLI (`agy`) has *heavy* token overhead — a single goal can trigger 10+ nested model calls, and users report exhausting Pro quotas in ~2 hours. If you use `agy` at all, keep parallel subagents ≤3 and check `/usage` often. Prefer it for the "must show Google tooling" narrative, not bulk coding.
@@ -49,6 +57,6 @@
 ## Pitch rules of thumb
 
 - Open with the user pain, show the live product within 30 seconds.
-- Say "Gemini 3.6 Flash" and point at the Google-stack pieces explicitly — it's a Google event.
+- Name-check whichever model actually powers the demo — no vendor is mandatory to mention now, just be accurate about what's running.
 - Have the deployed URL on a QR code; let judges try it on their phones.
 - Keep a recorded video as insurance; never demo a feature you didn't rehearse.

@@ -5,6 +5,11 @@ description: Strategy and execution guidelines for using Google Antigravity (agy
 
 # Antigravity Execution & Quota Strategy (PromptWars Chennai 2026)
 
+> **Provider note**: Antigravity/Google-model usage is now optional, not a submission
+> requirement — the "must show Google tooling" scoring pressure is gone. Use it where
+> it genuinely helps (local non-interactive batch generation, or one showcase task);
+> skip it entirely if another provider fits the problem statement better.
+
 ## 1. Physical Surface Overview
 
 - **Antigravity CLI (`agy` v1.1.6)**: Terminal-based agent execution. Signs in via Google Account OAuth.

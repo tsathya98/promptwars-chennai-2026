@@ -1,34 +1,33 @@
-// Streaming chat with tools via Vercel AI SDK. Pair with useChat() on the client.
-import { google } from "@ai-sdk/google";
-import { streamText, tool, convertToModelMessages, type UIMessage } from "ai";
-import { z } from "zod";
+import { NextResponse } from "next/server";
+import { generate } from "@/lib/openai";
 
 export const maxDuration = 60;
 
-const SYSTEM = `You are the assistant inside this app.
-- Prefer calling tools over guessing; if a tool fails, say what you tried.
-- Answers: 2-4 sentences, then data. Markdown tables for lists >3 items.
-- Never mention tool names or internals to the user.`;
-
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  try {
+    const { messages } = await req.json();
+    const lastUserMessage = messages?.[messages.length - 1]?.content || "Help me navigate recovery.";
 
-  const result = streamText({
-    model: google("gemini-3.6-flash"),
-    system: SYSTEM,
-    messages: await convertToModelMessages(messages.slice(-10)), // trim: TPM bites first
-    tools: {
-      // Replace with problem-specific tools. Every tool returns a verifiable
-      // result the model must check (the emptySections pattern).
-      getData: tool({
-        description: "Fetch data for the user's query.",
-        inputSchema: z.object({ query: z.string() }),
-        execute: async ({ query }) => {
-          return { rows: [], empty: true, note: `no data source wired yet for: ${query}` };
-        },
-      }),
-    },
-  });
+    const system = `You are a compassionate, expert AI recovery coach and caregiver assistant for individuals navigating substance use disorders.
+Keep your responses direct, empathetic, actionable (2-4 paragraphs max), and focused on immediate de-escalation, safety, and evidence-based recovery strategies.`;
 
-  return result.toUIMessageStreamResponse();
+    const response = await generate(lastUserMessage, {
+      system,
+      reasoningEffort: "low",
+    });
+
+    return NextResponse.json({
+      role: "assistant",
+      content: response.output_text,
+    });
+  } catch (error: unknown) {
+    console.error("Chat API Error:", error);
+    return NextResponse.json(
+      {
+        role: "assistant",
+        content: "I am here with you. Take a slow, deep breath. Focus on your grounding, drink water, and reach out to your support contact if you feel overwhelmed.",
+      },
+      { status: 500 }
+    );
+  }
 }
