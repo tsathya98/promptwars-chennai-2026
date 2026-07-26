@@ -6,19 +6,62 @@
 
 **A multimodal recovery and prevention platform for people navigating substance use disorders and the caregivers standing beside them.**
 
-[![Live Demo](https://img.shields.io/badge/TRY_LIVE_DEMO-IBUKI_CIRCLE-14B8A6?style=for-the-badge)](https://web-delta-three-92.vercel.app)
+[![PromptWars Chennai 2026](https://img.shields.io/badge/PromptWars_Chennai_2026-3rd_Place_%7C_2nd_Runner--Up-D4AF37?style=for-the-badge)](#award)
+[![Pitch Deck](https://img.shields.io/badge/Pitch_Deck-View_PDF-EF2B17?style=for-the-badge&logo=adobeacrobatreader&logoColor=white)](docs/pitch/IBUKI-Circle-PromptWars-Chennai-2026-Pitch-Deck.pdf)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.11-000000?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Tests](https://img.shields.io/badge/Vitest-65_passing-6E9F18?style=for-the-badge&logo=vitest)](#engineering-evidence)
 [![Model Agnostic](https://img.shields.io/badge/Model_Agnostic-OpenAI_%7C_Gemini-7A77FF?style=for-the-badge)](#model-agnostic-by-design)
 [![Languages](https://img.shields.io/badge/Languages-8_Indian_languages-F5C84C?style=for-the-badge)](#multilingual-by-construction)
 
-**[Launch the deployed application](https://web-delta-three-92.vercel.app)**
-
-Built for the **PromptWars Chennai 2026 Recovery & Prevention challenge**.
+Built for the **PromptWars Chennai 2026 Recovery & Prevention challenge** — and awarded **3rd Place (Second Runner-Up)**.
 
 </div>
 
 ---
+
+## Award
+
+> 🥉 **3rd Place · Second Runner-Up · PromptWars Chennai 2026**
+
+IBUKI Circle was selected as a top-three solution for turning a difficult healthcare challenge into a working, connected product: one tap can route a person to personalized recovery support, caregiver guidance, verified human resources, or an immediate model-independent emergency protocol.
+
+**Deployment status:** IBUKI Circle was deployed on **Vercel** for live judging at PromptWars Chennai 2026. The public deployment is intentionally not retained after the event because it depends on paid model credentials. No live application link is kept in this archive; the screenshots below preserve the judged experience, while the complete implementation, tests, safety boundaries, and local-run instructions remain in this repository.
+
+### Original pitch deck
+
+**[Open the 16-slide PromptWars pitch deck (PDF, 2.7 MB)](docs/pitch/IBUKI-Circle-PromptWars-Chennai-2026-Pitch-Deck.pdf)**
+
+The deck is archived as it was presented at the event. Its final slide contains the temporary Vercel URL and deliberately public evaluator credentials; they are retained only as part of the historical presentation and are not production credentials.
+
+## About the 3rd-place solution
+
+IBUKI Circle is a safety-controlled GenAI support platform for people navigating substance use disorders and for the family members or caregivers supporting them. It was designed around one observation: **when someone is in distress, asking them to write the perfect prompt is already too much friction.**
+
+The solution replaces the blank chatbot box with large one-tap situations, optional speech, live voice, and two clear user modes. A deterministic router checks safety first. Immediate danger never waits for a model; reviewed 112 guidance appears directly. For non-emergencies, a selected specialist uses live AI to create a short, structured plan, while typed schemas and allow-lists decide which trusted widgets, resources, and actions may reach the screen.
+
+What made the submission distinctive:
+
+- **AI is central, but never in charge of emergency routing or device actions.**
+- **Individual recovery and caregiver support are part of one connected experience.**
+- **Tap, text, browser speech, live speech-to-speech, read-aloud, visual widgets, calls, messages, sharing, and location preparation work as one journey.**
+- **Every external action remains user-controlled and is reported honestly as prepared or opened—never falsely as sent or completed.**
+- **Sensitive recovery content, transcripts, audio, contacts, and location are not persisted by this build.**
+
+## Responsive product views
+
+### Complete desktop page
+
+The complete zero-typing support surface before an intervention begins: language and mode selection, one-tap situations, optional context, speech and live voice, the three-stage safety pipeline, verified resources, and privacy guidance.
+
+![Complete desktop view of the IBUKI Circle support surface](docs/screenshots/ibuki-full-page.jpg)
+
+### Mobile view
+
+The same action-first experience at a real **390 × 844 px** mobile viewport, with the emergency action kept prominent and no horizontal overflow.
+
+<p align="center">
+  <img src="docs/screenshots/ibuki-mobile-view.jpg" width="390" alt="Responsive mobile view of IBUKI Circle">
+</p>
 
 ## Executive summary
 
@@ -57,20 +100,24 @@ When cognitive load is high:
 
 The challenge therefore requires one connected product that combines zero-typing access, personalized scripts, contextual safety, education, caregiver guidance, and multimodal interaction. IBUKI Circle implements that full journey rather than presenting disconnected AI demos.
 
-## Demo access
+## Judged demo access
 
-The application build includes a lightweight demo access gate. Credential comparison happens in the server route; the evaluator credentials are deliberately public and printed in the login UI:
+During judging, the application used a lightweight demo access gate. Credential comparison happened in the server route; the evaluator credentials were deliberately public and printed in the login UI:
 
 | Field | Value |
 |---|---|
 | Username | `ibuki-demo` |
 | Password | `circle2026` |
 
-The page provides a one-tap **Fill** button and a **Continue as guest** option, so an evaluator is never blocked by account setup. Successful entry creates a one-day `HttpOnly`, `Secure`, `SameSite=Lax` demo-session cookie. This is intentionally a hackathon access gate rather than a production identity system; the login screen keeps the 112 emergency link visible.
+The page provided a one-tap **Fill** button and a **Continue as guest** option, so an evaluator was never blocked by account setup. Successful entry created a one-day `HttpOnly`, `Secure`, `SameSite=Lax` demo-session cookie. This was intentionally a hackathon access gate rather than a production identity system; the login screen kept the 112 emergency link visible.
 
-## What an evaluator can test immediately
+<p align="center">
+  <img src="docs/screenshots/ibuki-evaluator-access.png" width="560" alt="IBUKI Circle evaluator access page with demo and guest entry">
+</p>
 
-| Scenario | What to do | Observable result | Runtime path |
+## Award-winning demo scenarios
+
+| Scenario | Evaluator action | Observable result | Runtime path |
 |---|---|---|---|
 | Evaluator entry | Choose **Continue as guest**, or fill the published demo credentials | Immediate access without registration, while the emergency number remains visible before entry | Server route → demo-session cookie → protected application page |
 | Strong craving | Tap **I'm having a strong urge** | A personalized short plan, optional paced breathing, a prepared circle message, and verified human-support actions | Deterministic routing → Recovery Coach → strict structured output |
@@ -82,6 +129,30 @@ The page provides a one-tap **Fill** button and a **Continue as guest** option, 
 | Live voice + screen action | Open **Live voice**, describe an urge, and ask for breathing or a support message | The conversation continues while a validated breathing guide, editable message, helpline card, or full support plan appears on screen | Short-lived token → WebRTC → allow-listed tool call → Zod validation → deterministic React widget |
 | Language adaptation | Choose Tamil, Hindi, Bengali, Telugu, Marathi, Kannada, or Malayalam, then tap or speak | The command buttons and crisis-path UI switch language instantly, the non-emergency plan is generated live in the selected language, and speech input, read-aloud, and live voice use the matching locale | Language preference → shared request schema → active model provider → localized widgets |
 | Education or resources | Ask for a helpline, treatment resource, or explanation | Plain-language guidance with resources selected only from the verified catalog | Resource Navigator → allow-listed resource IDs |
+
+### Live personalized recovery plan
+
+One tap selected the **Recovery Coach**, generated a short live plan, validated five widgets, prepared an editable circle message, and connected the person to verified human support.
+
+![AI-personalized strong-urge plan with deterministic widget validation](docs/screenshots/ibuki-strong-urge-plan.jpg)
+
+### Caregiver conversation guide
+
+Caregiver mode produced non-blaming opening words, what to say, what to avoid, warning signs, and a visible 112 escalation path.
+
+![Caregiver Guide conversation plan with say, avoid, and warning-sign guidance](docs/screenshots/ibuki-caregiver-guide.jpg)
+
+### Live voice becomes an on-screen support plan
+
+During a live WebRTC conversation, an allow-listed voice tool requested a support plan. The request re-entered the normal safety pipeline, selected the **Recovery Coach**, generated and validated five widgets, and placed them on screen while the conversation continued.
+
+![Live voice placing a validated Recovery Coach plan on screen](docs/screenshots/ibuki-live-voice-support-plan.png)
+
+### Model-independent emergency protocol
+
+The emergency macro skipped intervention generation entirely and immediately displayed reviewed 112 guidance, suspected-overdose response steps, and a user-controlled emergency message.
+
+![Verified emergency protocol that does not depend on AI](docs/screenshots/ibuki-emergency-protocol.jpg)
 
 ## User journeys
 
@@ -403,7 +474,7 @@ The interface is deliberately calm, high-contrast, and action-first:
 | Browser capabilities | Speech Recognition, Speech Synthesis, Web Share, Geolocation, `tel:`, SMS, and WhatsApp links | Multimodal input/output and explicit user-controlled actions |
 | Workspace | Nx 23 and pnpm workspaces | Repeatable task execution and cacheable checks |
 | Testing | Vitest 4 | Fast focused verification of schemas, routing, compilation, emergency behavior, and connector builders |
-| Deployment | Vercel, with standalone Docker support | Public evaluator access and portable production builds |
+| Event deployment | Vercel during live judging, with standalone Docker support | Public evaluator access for the competition and a portable production build |
 
 ## Engineering evidence
 
@@ -411,11 +482,11 @@ Verified locally against the current implementation:
 
 | Check | Current result | What it covers |
 |---|---|---|
-| `pnpm nx test web` | **65 tests passing across 14 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
+| `pnpm nx test web` | **65 tests passing across 13 test files** | Safety routing, emergency independence, schema contracts, widget compilation, fallbacks, and connector URL builders |
 | `pnpm nx lint web` | **0 errors, 0 warnings** | Next.js, React, TypeScript, hooks, and accessibility linting |
 | `pnpm nx build web` | **Passing production build** | Next.js 16 compilation, TypeScript checking, static generation, and all application/API routes |
 | `pnpm audit --prod --audit-level=high` | **No known vulnerabilities found** | Production dependency audit |
-| Deployed smoke check | **Passing** | `/` redirects to `/login`; demo login and guest entry return 200 with secure session cookies; `/api/health` returns `{ "ok": true }` |
+| Event deployment smoke check | **Passed during judging** | `/` redirected to `/login`; demo login and guest entry returned 200 with secure session cookies; `/api/health` returned `{ "ok": true }` |
 | Repository size | **Under 2 MiB of local Git metadata** | Comfortably below the challenge’s 10 MB repository limit |
 | GitHub Actions | **Configured** | Frozen install, guidance mirror check, lint, test, production audit, build, concurrency cancellation, and secret scan |
 
@@ -542,7 +613,7 @@ There is no mock mode. Evaluators may use the published demo credentials or bypa
 - evaluator demo access with a visible guest route and no account database;
 - official India-first helplines and reviewed educational resources;
 - responsive, keyboard-aware, reduced-motion-aware UI; and
-- public deployment, health endpoint, automated tests, CI, and security scanning.
+- Vercel deployment used during judging, archived product screenshots, a health endpoint, automated tests, CI, and security scanning.
 
 ### Intentionally not claimed
 
@@ -561,8 +632,8 @@ The three-library architecture is designed to grow safely: more reviewed special
 
 <div align="center">
 
-Built with care at **PromptWars Chennai 2026** by **Sathya T** ([@tsathya98](https://github.com/tsathya98))
+🥉 **3rd Place (Second Runner-Up) at PromptWars Chennai 2026**
 
-**[Try IBUKI Circle live](https://web-delta-three-92.vercel.app)**
+Built with care by **Sathya T** ([@tsathya98](https://github.com/tsathya98))
 
 </div>
